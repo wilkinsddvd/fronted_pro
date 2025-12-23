@@ -4,7 +4,6 @@ import { useRoute } from 'vue-router'
 import { marked } from 'marked'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/atom-one-light.css'
-import CommentBox from './CommentBox.vue'
 import { parseFrontMatter } from '../utils/post-meta.js'
 
 const route = useRoute()
@@ -55,7 +54,6 @@ function extractTitle(md) {
     </div>
     <div v-html="content" class="markdown-body"></div>
     <!-- 评论区（如需可以解除注释下面） -->
-    <CommentBox />
   </article>
 </template>
 
