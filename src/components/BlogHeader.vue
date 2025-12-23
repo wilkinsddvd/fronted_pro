@@ -1,3 +1,7 @@
+<script setup>
+import ThemeToggle from './ThemeToggle.vue'
+</script>
+
 <template>
   <header class="blog-header">
     <h1 @click="$router.push('/')">我的博客</h1>
@@ -8,9 +12,9 @@
       <router-link to="/archives">归档</router-link>
       <router-link to="/about">关于</router-link>
       <router-link to="/login">登录</router-link>
-      <ThemeToggle />
+      <ThemeToggle />   <!-- 添加在此处/合适位置 -->
       <a href="https://github.com/wilkinsddvd/fronted_pro" target="_blank">GitHub</a>
-     </nav>
+    </nav>
   </header>
 </template>
 <style scoped>

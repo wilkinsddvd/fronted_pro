@@ -85,3 +85,15 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* 新增：支持手动切换深色主题 - dark类手动加到html/body均可 */
+.dark {
+  --color-background: var(--vt-c-black);
+  --color-background-soft: var(--vt-c-black-soft);
+  --color-background-mute: var(--vt-c-black-mute);
+
+  --color-border: var(--vt-c-divider-dark-2);
+  --color-border-hover: var(--vt-c-divider-dark-1);
+
+  --color-heading: var(--vt-c-text-dark-1);
+  --color-text: var(--vt-c-text-dark-2);
+}
