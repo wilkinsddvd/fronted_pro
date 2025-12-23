@@ -18,7 +18,7 @@ function handleRegister() {
     error.value = '两次密码输入不一致'
     return
   }
-  // 假注册逻辑：直接跳到登录页
+  // 假注册逻辑
   localStorage.setItem('user', username.value)
   router.push('/')
 }
@@ -39,5 +39,5 @@ function handleRegister() {
 </template>
 
 <style scoped>
-@import './Login.vue'; /* 复用Login页面样式 */
+@import './form-common.css';
 </style>

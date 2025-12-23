@@ -13,7 +13,7 @@ function handleLogin() {
     error.value = '用户名和密码不能为空'
     return
   }
-  // 假登录逻辑：用户名为test，密码为123456即通过
+  // 假登录逻辑
   if (username.value === 'test' && password.value === '123456') {
     localStorage.setItem('user', username.value)
     router.push('/')
@@ -37,38 +37,5 @@ function handleLogin() {
 </template>
 
 <style scoped>
-.form-container {
-  margin: 3rem auto;
-  max-width: 340px;
-  padding:2rem 2rem 1.5rem;
-  border-radius: 10px;
-  background: var(--color-background-soft);
-  box-shadow: 0 2px 24px 0 #ccc5;
-}
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-}
-input {
-  font-size: 1rem;
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  padding: .7em 1em;
-  background: var(--color-background-mute);
-  color: var(--color-text);
-}
-button {
-  padding: .7em;
-  font-size: 1rem;
-  background: hsla(160, 100%, 37%, 1);
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-button:hover {
-  background: hsla(160, 100%, 45%, 1);
-}
-.error { color: #e55; font-size: .95em;}
+@import './form-common.css';
 </style>
