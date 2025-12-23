@@ -2,9 +2,15 @@
   <header class="blog-header">
     <h1 @click="$router.push('/')">我的博客</h1>
     <nav>
-      <a href="/">首页</a>
+      <router-link to="/">首页</router-link>
+      <router-link to="/categories">分类</router-link>
+      <router-link to="/tags">标签</router-link>
+      <router-link to="/archives">归档</router-link>
+      <router-link to="/about">关于</router-link>
+      <router-link to="/login">登录</router-link>
+      <ThemeToggle />
       <a href="https://github.com/wilkinsddvd/fronted_pro" target="_blank">GitHub</a>
-    </nav>
+     </nav>
   </header>
 </template>
 <style scoped>
