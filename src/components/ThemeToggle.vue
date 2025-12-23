@@ -1,18 +1,21 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 
-// 获取/设置主题：优先取localStorage，其次系统偏好
+// 主题切换storage key
 const THEME_KEY = 'blog_theme'
 const theme = ref(getTheme())
 
 function setTheme(val) {
-  if(val === 'dark') {
+  // 先移除原有的主题class，保证互斥
+  document.documentElement.classList.remove('dark', 'light')
+  if (val === 'dark') {
     document.documentElement.classList.add('dark')
-  } else {
-    document.documentElement.classList.remove('dark')
+  } else if (val === 'light') {
+    document.documentElement.classList.add('light')
   }
   localStorage.setItem(THEME_KEY, val)
 }
+
 function getTheme() {
   let t = localStorage.getItem(THEME_KEY)
   if (!t) {
@@ -20,18 +23,19 @@ function getTheme() {
   }
   return t
 }
+
 function toggleTheme() {
   theme.value = theme.value === 'dark' ? 'light' : 'dark'
   setTheme(theme.value)
 }
-// 初始设定
+
 onMounted(() => {
   setTheme(theme.value)
 })
 </script>
 
 <template>
-  <button class="theme-toggle" :title="theme === 'dark' ? '切换为亮色' : '切换为暗色'" @click="toggleTheme">
+  <button class="theme-toggle" :title="theme === 'dark' ? '切换为浅色' : '切换为深色'" @click="toggleTheme">
     <span v-if="theme === 'dark'">🌙</span>
     <span v-else>🌞</span>
   </button>
