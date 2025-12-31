@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 const tags = ref([
-  '前端', '生活', 'Vue', '笔记'
+  '前端','后端','全栈', '爱情','生活','学习', 'Vue', 'fastapi','笔记'
 ])
 </script>
 <template>
