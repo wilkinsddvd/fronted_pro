@@ -1,23 +1,13 @@
 <template>
-  <div class="main-app">
-    <!-- 顶部导航栏 -->
-    <BlogHeader />
+  <div>
+    <BlogHeader/>
+    <SearchBar @search="handleSearch"/>
+    <CalendarPanel @select="handleDate"/>
 
-    <!-- 搜索栏，居中美化 -->
-    <div class="search-container">
-      <SearchBar @search="handleSearch" />
-    </div>
+    <!-- 主内容 -->
+    <router-view :search="searchKeyword" :date="selectedDate"/>
 
-    <!-- 右上角折叠日历 -->
-    <CalendarPanel @select="handleDate" />
-
-    <!-- 主内容区域 -->
-    <div class="content-container">
-      <router-view :search="searchKeyword" :date="selectedDate" />
-    </div>
-
-    <!-- 页脚 -->
-    <BlogFooter />
+    <BlogFooter/>
   </div>
 </template>
 
@@ -38,35 +28,3 @@ function handleDate(date) {
   selectedDate.value = date
 }
 </script>
-
-<style>
-body {
-  background: #181920;
-  color: #fff;
-  font-family: "PingFang SC", "Helvetica Neue", Arial, "Microsoft YaHei", sans-serif;
-  margin: 0;
-}
-
-.main-app {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.search-container {
-  margin: 0 auto;
-  margin-top: 36px;
-  margin-bottom: 12px;
-  max-width: 700px;
-  width: 90%;
-}
-
-.content-container {
-  margin: 0 auto;
-  flex: 1;
-  max-width: 800px;
-  width: 95%;
-  padding-bottom: 24px;
-  background: transparent;
-}
-</style>
