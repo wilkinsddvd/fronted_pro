@@ -40,6 +40,9 @@ const chartRef = ref(null)
 const timeRange = ref('week')
 let chartInstance = null
 
+// Chart resize delay for proper initialization
+const CHART_RESIZE_DELAY = 200
+
 // Chart color configuration
 const CHART_COLORS = {
   new: {
@@ -136,7 +139,7 @@ onMounted(async () => {
   // Resize chart after initialization to match container
   setTimeout(() => {
     chartInstance?.resize()
-  }, 200)
+  }, CHART_RESIZE_DELAY)
   
   window.addEventListener('resize', () => {
     chartInstance?.resize()

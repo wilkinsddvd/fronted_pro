@@ -167,6 +167,9 @@ let priorityChart = null
 let userStatsChart = null
 let responseTimeChart = null
 
+// Chart resize delay for proper initialization
+const CHART_RESIZE_DELAY = 200
+
 // Fetch overview statistics
 const fetchOverviewStats = async () => {
   try {
@@ -550,7 +553,7 @@ onMounted(async () => {
     priorityChart?.resize()
     userStatsChart?.resize()
     responseTimeChart?.resize()
-  }, 200)
+  }, CHART_RESIZE_DELAY)
   
   // Fetch initial data
   refreshData()

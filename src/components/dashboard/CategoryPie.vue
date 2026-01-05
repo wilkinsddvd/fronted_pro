@@ -29,6 +29,9 @@ const props = defineProps({
 const chartRef = ref(null)
 let chartInstance = null
 
+// Chart resize delay for proper initialization
+const CHART_RESIZE_DELAY = 200
+
 const initChart = () => {
   if (!chartRef.value) return
   
@@ -94,7 +97,7 @@ onMounted(async () => {
   // Resize chart after initialization to match container
   setTimeout(() => {
     chartInstance?.resize()
-  }, 200)
+  }, CHART_RESIZE_DELAY)
   
   window.addEventListener('resize', () => {
     chartInstance?.resize()
