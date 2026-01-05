@@ -196,18 +196,21 @@ onMounted(() => {
   min-height: 0;
 }
 
-.dashboard :deep(.el-row) {
-  flex: 1;
-  min-height: 0;
+/* Stats cards row - fixed height */
+.dashboard > :deep(.el-row:first-of-type) {
+  flex-shrink: 0;
+  margin-bottom: 20px;
 }
 
-.dashboard > :deep(.el-row:last-of-type) {
+/* Charts row - flexible height */
+.dashboard > :deep(.el-row:nth-child(2)) {
   display: flex;
   flex: 1;
   min-height: 0;
+  margin-bottom: 0;
 }
 
-.dashboard > :deep(.el-row:last-of-type .el-col) {
+.dashboard > :deep(.el-row:nth-child(2) .el-col) {
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -221,12 +224,19 @@ onMounted(() => {
   margin-bottom: 0;
 }
 
-.dashboard :deep(.el-card__body) {
+.dashboard :deep(.trend-chart-card .el-card__body),
+.dashboard :deep(.category-pie-card .el-card__body) {
   flex: 1;
   display: flex;
   flex-direction: column;
   min-height: 0;
   padding: 20px;
+}
+
+/* Error alert - fixed at bottom */
+.dashboard > :deep(.el-alert) {
+  flex-shrink: 0;
+  margin-top: 20px;
 }
 
 @keyframes fadeIn {
@@ -244,6 +254,10 @@ onMounted(() => {
 @media (max-width: 768px) {
   .dashboard :deep(.el-col) {
     margin-bottom: 12px;
+  }
+  
+  .dashboard > :deep(.el-row:nth-child(2)) {
+    flex-direction: column;
   }
 }
 </style>

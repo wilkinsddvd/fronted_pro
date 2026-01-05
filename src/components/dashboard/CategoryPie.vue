@@ -12,7 +12,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import * as echarts from 'echarts'
 
 const props = defineProps({
@@ -87,13 +87,14 @@ const updateChart = () => {
   chartInstance.setOption(option)
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await nextTick()
   initChart()
   
   // Resize chart after initialization to match container
   setTimeout(() => {
     chartInstance?.resize()
-  }, 100)
+  }, 200)
   
   window.addEventListener('resize', () => {
     chartInstance?.resize()

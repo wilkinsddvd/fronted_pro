@@ -112,7 +112,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import * as echarts from 'echarts'
 import { 
@@ -535,7 +535,9 @@ const refreshData = async () => {
 }
 
 // Lifecycle hooks
-onMounted(() => {
+onMounted(async () => {
+  await nextTick()
+  
   // Initialize all charts
   initStatusChart()
   initPriorityChart()
@@ -548,7 +550,7 @@ onMounted(() => {
     priorityChart?.resize()
     userStatsChart?.resize()
     responseTimeChart?.resize()
-  }, 100)
+  }, 200)
   
   // Fetch initial data
   refreshData()
@@ -638,10 +640,11 @@ onUnmounted(() => {
 }
 
 .chart-card {
-  margin-bottom: 20px;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  margin-bottom: 0;
 }
 
 .chart-card :deep(.el-card__body) {
@@ -655,7 +658,7 @@ onUnmounted(() => {
 .chart-container {
   flex: 1;
   width: 100%;
-  min-height: 300px;
+  min-height: 280px;
   position: relative;
   display: flex;
 }
@@ -665,16 +668,12 @@ onUnmounted(() => {
   min-height: 0;
 }
 
-.statistics > :deep(.el-row) {
-  margin-bottom: 20px;
-}
-
-.statistics > :deep(.el-row:nth-child(3)),
-.statistics > :deep(.el-row:nth-child(4)),
-.statistics > :deep(.el-row:nth-child(5)) {
+/* First row of charts (2 pie charts) - flex with equal distribution */
+.statistics > :deep(.el-row:nth-child(3)) {
   flex: 1;
   min-height: 0;
   display: flex;
+  margin-bottom: 20px;
 }
 
 .statistics > :deep(.el-row:nth-child(3) .el-col) {
@@ -683,11 +682,38 @@ onUnmounted(() => {
   min-height: 0;
 }
 
-.statistics > :deep(.el-row:nth-child(4) .el-col),
+/* Second row (user stats bar chart) - flex with larger portion */
+.statistics > :deep(.el-row:nth-child(4)) {
+  flex: 1.2;
+  min-height: 0;
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.statistics > :deep(.el-row:nth-child(4) .el-col) {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Third row (response time chart) - flex with larger portion */
+.statistics > :deep(.el-row:nth-child(5)) {
+  flex: 1.2;
+  min-height: 0;
+  display: flex;
+  margin-bottom: 0;
+}
+
 .statistics > :deep(.el-row:nth-child(5) .el-col) {
   display: flex;
   flex-direction: column;
   min-height: 0;
+}
+
+/* Error alert at the bottom */
+.statistics > :deep(.el-alert) {
+  flex-shrink: 0;
+  margin-top: 20px;
 }
 
 @keyframes fadeIn {
