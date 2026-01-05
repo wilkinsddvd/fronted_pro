@@ -35,12 +35,18 @@ defineProps({
 
 <style scoped>
 .stats-cards {
+  width: 100%;
   margin-bottom: 20px;
+}
+
+.stats-cards :deep(.el-row) {
+  width: 100%;
 }
 
 .stat-card {
   border-radius: 8px;
   transition: transform 0.3s;
+  height: 100%;
 }
 
 .stat-card:hover {

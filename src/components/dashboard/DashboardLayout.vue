@@ -18,6 +18,7 @@ import HeaderBar from './HeaderBar.vue'
 <style scoped>
 .dashboard-layout {
   display: flex;
+  width: 100%;
   height: 100vh;
   background-color: #f0f2f5;
   overflow: hidden;
@@ -28,6 +29,8 @@ import HeaderBar from './HeaderBar.vue'
   display: flex;
   flex-direction: column;
   flex: 1;
+  width: 100%;
+  min-width: 0;
   height: 100vh;
   overflow: hidden;
   transition: margin-left 0.3s;
@@ -36,6 +39,8 @@ import HeaderBar from './HeaderBar.vue'
 .content-wrapper {
   padding: 84px 24px 24px 24px;
   flex: 1;
+  width: 100%;
+  min-width: 0;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
