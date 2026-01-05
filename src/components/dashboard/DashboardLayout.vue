@@ -17,19 +17,28 @@ import HeaderBar from './HeaderBar.vue'
 
 <style scoped>
 .dashboard-layout {
-  min-height: 100vh;
+  display: flex;
+  height: 100vh;
   background-color: #f0f2f5;
+  overflow: hidden;
 }
 
 .main-container {
   margin-left: 200px;
-  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100vh;
+  overflow: hidden;
   transition: margin-left 0.3s;
 }
 
 .content-wrapper {
   padding: 84px 24px 24px 24px;
-  min-height: calc(100vh - 60px);
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Responsive Design */

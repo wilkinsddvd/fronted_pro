@@ -131,6 +131,12 @@ const handleRangeChange = () => {
 
 onMounted(() => {
   initChart()
+  
+  // Resize chart after initialization to match container
+  setTimeout(() => {
+    chartInstance?.resize()
+  }, 100)
+  
   window.addEventListener('resize', () => {
     chartInstance?.resize()
   })
@@ -147,7 +153,6 @@ watch(() => props.data, () => {
 
 <style scoped>
 .trend-chart-card {
-  margin-bottom: 20px;
   border-radius: 8px;
 }
 
@@ -158,7 +163,14 @@ watch(() => props.data, () => {
 }
 
 .chart-container {
-  height: 350px;
+  flex: 1;
   width: 100%;
+  min-height: 0;
+  display: flex;
+}
+
+.chart-container > div {
+  flex: 1;
+  min-height: 0;
 }
 </style>

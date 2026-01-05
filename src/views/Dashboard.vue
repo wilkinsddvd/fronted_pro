@@ -190,6 +190,43 @@ onMounted(() => {
 <style scoped>
 .dashboard {
   animation: fadeIn 0.3s ease-in;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.dashboard :deep(.el-row) {
+  flex: 1;
+  min-height: 0;
+}
+
+.dashboard > :deep(.el-row:last-of-type) {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.dashboard > :deep(.el-row:last-of-type .el-col) {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.dashboard :deep(.trend-chart-card),
+.dashboard :deep(.category-pie-card) {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin-bottom: 0;
+}
+
+.dashboard :deep(.el-card__body) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 20px;
 }
 
 @keyframes fadeIn {

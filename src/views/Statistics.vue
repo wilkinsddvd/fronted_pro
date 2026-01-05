@@ -75,7 +75,7 @@
           <template #header>
             <span>用户处理工单统计</span>
           </template>
-          <div v-loading="userStatsLoading" class="chart-container" style="height: 400px;">
+          <div v-loading="userStatsLoading" class="chart-container">
             <div ref="userStatsChartRef" style="width: 100%; height: 100%;"></div>
             <el-empty v-if="!userStatsLoading && userStatsData.length === 0" description="暂无数据" />
           </div>
@@ -90,7 +90,7 @@
           <template #header>
             <span>响应时间统计</span>
           </template>
-          <div v-loading="responseTimeLoading" class="chart-container" style="height: 400px;">
+          <div v-loading="responseTimeLoading" class="chart-container">
             <div ref="responseTimeChartRef" style="width: 100%; height: 100%;"></div>
             <el-empty v-if="!responseTimeLoading && responseTimeData.length === 0" description="暂无数据" />
           </div>
@@ -542,6 +542,14 @@ onMounted(() => {
   initUserStatsChart()
   initResponseTimeChart()
   
+  // Resize charts after initialization to match containers
+  setTimeout(() => {
+    statusChart?.resize()
+    priorityChart?.resize()
+    userStatsChart?.resize()
+    responseTimeChart?.resize()
+  }, 100)
+  
   // Fetch initial data
   refreshData()
   
@@ -571,15 +579,21 @@ onUnmounted(() => {
 <style scoped>
 .statistics {
   animation: fadeIn 0.3s ease-in;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
 }
 
 .filter-card {
   margin-bottom: 20px;
   border-radius: 8px;
+  flex-shrink: 0;
 }
 
 .stats-overview {
   margin-bottom: 20px;
+  flex-shrink: 0;
 }
 
 .stat-card {
@@ -626,12 +640,54 @@ onUnmounted(() => {
 .chart-card {
   margin-bottom: 20px;
   border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-card :deep(.el-card__body) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 20px;
 }
 
 .chart-container {
-  height: 350px;
+  flex: 1;
   width: 100%;
+  min-height: 300px;
   position: relative;
+  display: flex;
+}
+
+.chart-container > div {
+  flex: 1;
+  min-height: 0;
+}
+
+.statistics > :deep(.el-row) {
+  margin-bottom: 20px;
+}
+
+.statistics > :deep(.el-row:nth-child(3)),
+.statistics > :deep(.el-row:nth-child(4)),
+.statistics > :deep(.el-row:nth-child(5)) {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+.statistics > :deep(.el-row:nth-child(3) .el-col) {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.statistics > :deep(.el-row:nth-child(4) .el-col),
+.statistics > :deep(.el-row:nth-child(5) .el-col) {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 @keyframes fadeIn {
