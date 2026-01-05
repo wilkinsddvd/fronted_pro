@@ -40,6 +40,18 @@ const chartRef = ref(null)
 const timeRange = ref('week')
 let chartInstance = null
 
+// Chart color configuration
+const CHART_COLORS = {
+  new: {
+    primary: '#409EFF',
+    gradient: ['rgba(64, 158, 255, 0.3)', 'rgba(64, 158, 255, 0.05)']
+  },
+  completed: {
+    primary: '#67C23A',
+    gradient: ['rgba(103, 194, 58, 0.3)', 'rgba(103, 194, 58, 0.05)']
+  }
+}
+
 const initChart = () => {
   if (!chartRef.value) return
   
@@ -83,12 +95,12 @@ const updateChart = () => {
         smooth: true,
         data: props.data.newTickets || [],
         itemStyle: {
-          color: '#409EFF'
+          color: CHART_COLORS.new.primary
         },
         areaStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(64, 158, 255, 0.3)' },
-            { offset: 1, color: 'rgba(64, 158, 255, 0.05)' }
+            { offset: 0, color: CHART_COLORS.new.gradient[0] },
+            { offset: 1, color: CHART_COLORS.new.gradient[1] }
           ])
         }
       },
@@ -98,12 +110,12 @@ const updateChart = () => {
         smooth: true,
         data: props.data.completedTickets || [],
         itemStyle: {
-          color: '#67C23A'
+          color: CHART_COLORS.completed.primary
         },
         areaStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(103, 194, 58, 0.3)' },
-            { offset: 1, color: 'rgba(103, 194, 58, 0.05)' }
+            { offset: 0, color: CHART_COLORS.completed.gradient[0] },
+            { offset: 1, color: CHART_COLORS.completed.gradient[1] }
           ])
         }
       }
