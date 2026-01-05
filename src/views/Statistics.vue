@@ -117,9 +117,7 @@ import { ElMessage } from 'element-plus'
 import * as echarts from 'echarts'
 import { 
   DocumentAdd, 
-  Loading, 
-  SuccessFilled, 
-  WarnTriangleFilled,
+  SuccessFilled,
   Document,
   Timer
 } from '@element-plus/icons-vue'
@@ -136,13 +134,15 @@ const dateRange = ref([])
 const refreshing = ref(false)
 const error = ref('')
 
-// Overview stats
-const overviewStats = ref([
-  { key: 'total', label: '工单总数', value: 0, color: '#409EFF', icon: Document },
-  { key: 'new', label: '新增工单', value: 0, color: '#E6A23C', icon: DocumentAdd },
-  { key: 'completed', label: '已完成', value: 0, color: '#67C23A', icon: SuccessFilled },
-  { key: 'avgTime', label: '平均响应时间(h)', value: 0, color: '#909399', icon: Timer }
-])
+// Overview stats configuration
+const statsConfig = [
+  { key: 'total', label: '工单总数', valueKey: 'totalTickets', color: '#409EFF', icon: Document },
+  { key: 'new', label: '新增工单', valueKey: 'newTickets', color: '#E6A23C', icon: DocumentAdd },
+  { key: 'completed', label: '已完成', valueKey: 'completedTickets', color: '#67C23A', icon: SuccessFilled },
+  { key: 'avgTime', label: '平均响应时间(h)', valueKey: 'avgResponseTime', color: '#909399', icon: Timer }
+]
+
+const overviewStats = ref(statsConfig.map(stat => ({ ...stat, value: 0 })))
 
 // Chart data
 const statusData = ref([])
@@ -179,12 +179,10 @@ const fetchOverviewStats = async () => {
     const res = await getStatisticsData(params)
     if (res && res.data) {
       const data = res.data
-      overviewStats.value = [
-        { key: 'total', label: '工单总数', value: data.totalTickets || 0, color: '#409EFF', icon: Document },
-        { key: 'new', label: '新增工单', value: data.newTickets || 0, color: '#E6A23C', icon: DocumentAdd },
-        { key: 'completed', label: '已完成', value: data.completedTickets || 0, color: '#67C23A', icon: SuccessFilled },
-        { key: 'avgTime', label: '平均响应时间(h)', value: data.avgResponseTime || 0, color: '#909399', icon: Timer }
-      ]
+      overviewStats.value = statsConfig.map(stat => ({
+        ...stat,
+        value: data[stat.valueKey] || 0
+      }))
     }
   } catch (err) {
     console.error('获取概览统计失败:', err)
@@ -523,7 +521,7 @@ const refreshData = async () => {
   error.value = ''
   
   try {
-    await Promise.all([
+    await Promise.allSettled([
       fetchOverviewStats(),
       fetchStatusDistribution(),
       fetchPriorityDistribution(),
@@ -531,9 +529,6 @@ const refreshData = async () => {
       fetchResponseTimeStats()
     ])
     ElMessage.success('数据刷新成功')
-  } catch (err) {
-    console.error('刷新数据失败:', err)
-    ElMessage.error('数据刷新失败')
   } finally {
     refreshing.value = false
   }
@@ -551,11 +546,17 @@ onMounted(() => {
   refreshData()
   
   // Handle window resize
-  window.addEventListener('resize', () => {
+  const handleResize = () => {
     statusChart?.resize()
     priorityChart?.resize()
     userStatsChart?.resize()
     responseTimeChart?.resize()
+  }
+  window.addEventListener('resize', handleResize)
+  
+  // Cleanup
+  onUnmounted(() => {
+    window.removeEventListener('resize', handleResize)
   })
 })
 
