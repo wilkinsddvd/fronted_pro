@@ -25,45 +25,10 @@
 </template>
 
 <script setup>
-import { DocumentAdd, Loading, SuccessFilled, WarnTriangleFilled } from '@element-plus/icons-vue'
-
 defineProps({
   stats: {
     type: Array,
-    default: () => [
-      {
-        key: 'new',
-        label: '新增工单',
-        value: 0,
-        trend: 0,
-        color: '#409EFF',
-        icon: DocumentAdd
-      },
-      {
-        key: 'processing',
-        label: '处理中',
-        value: 0,
-        trend: 0,
-        color: '#E6A23C',
-        icon: Loading
-      },
-      {
-        key: 'completed',
-        label: '已完成',
-        value: 0,
-        trend: 0,
-        color: '#67C23A',
-        icon: SuccessFilled
-      },
-      {
-        key: 'overdue',
-        label: '逾期',
-        value: 0,
-        trend: 0,
-        color: '#F56C6C',
-        icon: WarnTriangleFilled
-      }
-    ]
+    default: () => []
   }
 })
 </script>
