@@ -246,6 +246,63 @@ export const getCategoryStats = () => {
   })
 }
 
+// ==================== 统计相关API ====================
+
+/**
+ * 获取详细统计数据
+ * @param {Object} params - 查询参数
+ * @param {string} params.startDate - 开始日期
+ * @param {string} params.endDate - 结束日期
+ */
+export const getStatisticsData = (params = {}) => {
+  return request({
+    url: '/statistics/overview',
+    method: 'get',
+    params
+  })
+}
+
+/**
+ * 获取工单状态分布
+ */
+export const getTicketStatusDistribution = () => {
+  return request({
+    url: '/statistics/status-distribution',
+    method: 'get'
+  })
+}
+
+/**
+ * 获取工单优先级分布
+ */
+export const getTicketPriorityDistribution = () => {
+  return request({
+    url: '/statistics/priority-distribution',
+    method: 'get'
+  })
+}
+
+/**
+ * 获取用户处理统计
+ */
+export const getUserHandlingStats = () => {
+  return request({
+    url: '/statistics/user-handling',
+    method: 'get'
+  })
+}
+
+/**
+ * 获取响应时间统计
+ */
+export const getResponseTimeStats = (params = {}) => {
+  return request({
+    url: '/statistics/response-time',
+    method: 'get',
+    params
+  })
+}
+
 // ==================== 工单管理相关API ====================
 
 /**

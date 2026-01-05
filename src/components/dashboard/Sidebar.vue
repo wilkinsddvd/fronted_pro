@@ -58,6 +58,8 @@ const activeMenu = computed(() => route.path)
   top: 0;
   overflow-y: auto;
   box-shadow: 2px 0 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  transition: transform 0.3s;
 }
 
 .logo-container {
@@ -74,6 +76,8 @@ const activeMenu = computed(() => route.path)
   font-size: 18px;
   font-weight: 600;
   margin: 0;
+  text-align: center;
+  padding: 0 10px;
 }
 
 .sidebar-menu {
@@ -83,5 +87,16 @@ const activeMenu = computed(() => route.path)
 .sidebar-menu .el-menu-item {
   height: 50px;
   line-height: 50px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-200px);
+  }
+  
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
 }
 </style>

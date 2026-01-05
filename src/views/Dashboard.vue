@@ -202,4 +202,11 @@ onMounted(() => {
     transform: translateY(0);
   }
 }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dashboard :deep(.el-col) {
+    margin-bottom: 12px;
+  }
+}
 </style>
