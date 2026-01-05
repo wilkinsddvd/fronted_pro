@@ -10,7 +10,7 @@ import Register from '../components/Register.vue'
 
 const routes = [
   { path: '/', name: 'Home', component: BlogPostList },
-  { path: '/post/:slug', name: 'PostDetail', component: BlogPostDetail, props: true },
+  { path: '/post/:slug', name: 'PostDetail', component: BlogPostDetail, props: true }, // slug实际为id
   { path: '/categories', name: 'Categories', component: CategoryList },
   { path: '/tags', name: 'Tags', component: TagList },
   { path: '/archives', name: 'Archives', component: ArchiveList },
