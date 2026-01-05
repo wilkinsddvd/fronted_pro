@@ -5,6 +5,7 @@ import { marked } from 'marked'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/atom-one-light.css'
 import { getPost, addPostView, addPostLike } from '@/api/index.js'
+import { showMessage } from '@/utils/message.js'
 
 const route = useRoute()
 const content = ref('')
@@ -25,7 +26,8 @@ marked.setOptions({
 async function loadPost() {
   loading.value = true
   error.value = ''
-  const postId = route.params.slug // 路由参数名仍为slug，但实际传的是id
+  // Note: route.params.slug contains the post ID (parameter name kept for backward compatibility)
+  const postId = route.params.slug
   
   try {
     const res = await getPost(postId)
@@ -56,10 +58,10 @@ async function handleLike() {
   const postId = route.params.slug
   try {
     await addPostLike(postId)
-    alert('点赞成功！')
+    showMessage('点赞成功！', 'success')
   } catch (e) {
     console.error('Failed to like:', e)
-    alert('点赞失败: ' + e.message)
+    showMessage('点赞失败: ' + e.message, 'error')
   }
 }
 

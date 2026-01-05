@@ -4,7 +4,7 @@ const props = defineProps(['post'])
 <template>
   <article class="post-item">
     <h3>
-      <router-link :to="'/post/' + post.id">{{ post.title }}</router-link>
+      <router-link :to="{ name: 'PostDetail', params: { slug: post.id } }">{{ post.title }}</router-link>
     </h3>
     <div class="post-meta">
       <small class="date">{{ post.date }}</small>

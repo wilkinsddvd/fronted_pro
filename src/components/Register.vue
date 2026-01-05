@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { register } from '@/api/index.js'
+import { showMessage } from '@/utils/message.js'
 
 const username = ref('')
 const password = ref('')
@@ -29,10 +30,13 @@ async function handleRegister() {
     })
     // 保存用户信息到本地存储
     localStorage.setItem('user', JSON.stringify(res.data))
-    alert('注册成功！')
-    router.push('/')
+    showMessage('注册成功！', 'success')
+    setTimeout(() => {
+      router.push('/')
+    }, 500)
   } catch (e) {
     error.value = e.message || '注册失败'
+    showMessage(error.value, 'error')
   } finally {
     loading.value = false
   }

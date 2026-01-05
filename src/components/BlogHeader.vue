@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import ThemeToggle from './ThemeToggle.vue'
 import { logout } from '@/api/index.js'
+import { showMessage } from '@/utils/message.js'
 
 const router = useRouter()
 const currentUser = ref(null)
@@ -23,13 +24,14 @@ async function handleLogout() {
     await logout()
     localStorage.removeItem('user')
     currentUser.value = null
-    alert('已登出')
+    showMessage('已登出', 'success')
     router.push('/')
   } catch (e) {
     console.error('Logout failed:', e)
     // 即使后端失败，也清除本地状态
     localStorage.removeItem('user')
     currentUser.value = null
+    showMessage('已登出', 'success')
     router.push('/')
   }
 }

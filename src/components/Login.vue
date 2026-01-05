@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { login } from '@/api/index.js'
+import { showMessage } from '@/utils/message.js'
 
 const username = ref('')
 const password = ref('')
@@ -24,10 +25,13 @@ async function handleLogin() {
     })
     // 保存用户信息到本地存储
     localStorage.setItem('user', JSON.stringify(res.data))
-    alert('登录成功！')
-    router.push('/')
+    showMessage('登录成功！', 'success')
+    setTimeout(() => {
+      router.push('/')
+    }, 500)
   } catch (e) {
     error.value = e.message || '登录失败，请检查用户名和密码'
+    showMessage(error.value, 'error')
   } finally {
     loading.value = false
   }
