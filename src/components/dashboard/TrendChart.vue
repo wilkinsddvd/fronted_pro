@@ -16,8 +16,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import * as echarts from 'echarts'
+import { CHART_RESIZE_DELAY } from '@/constants/charts'
 
 const props = defineProps({
   data: {
@@ -129,8 +130,15 @@ const handleRangeChange = () => {
   emit('rangeChange', timeRange.value)
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await nextTick()
   initChart()
+  
+  // Resize chart after initialization to match container
+  setTimeout(() => {
+    chartInstance?.resize()
+  }, CHART_RESIZE_DELAY)
+  
   window.addEventListener('resize', () => {
     chartInstance?.resize()
   })
@@ -147,7 +155,6 @@ watch(() => props.data, () => {
 
 <style scoped>
 .trend-chart-card {
-  margin-bottom: 20px;
   border-radius: 8px;
 }
 
@@ -158,7 +165,14 @@ watch(() => props.data, () => {
 }
 
 .chart-container {
-  height: 350px;
+  flex: 1;
   width: 100%;
+  min-height: 0;
+  display: flex;
+}
+
+.chart-container > div {
+  flex: 1;
+  min-height: 0;
 }
 </style>

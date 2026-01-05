@@ -40,7 +40,7 @@
     </el-row>
 
     <!-- Charts Section -->
-    <el-row :gutter="20">
+    <el-row :gutter="20" class="charts-row-pie">
       <!-- Status Distribution Pie Chart -->
       <el-col :xs="24" :md="12">
         <el-card shadow="hover" class="chart-card">
@@ -69,13 +69,13 @@
     </el-row>
 
     <!-- User Handling Stats -->
-    <el-row :gutter="20">
+    <el-row :gutter="20" class="charts-row-bar">
       <el-col :span="24">
         <el-card shadow="hover" class="chart-card">
           <template #header>
             <span>用户处理工单统计</span>
           </template>
-          <div v-loading="userStatsLoading" class="chart-container" style="height: 400px;">
+          <div v-loading="userStatsLoading" class="chart-container">
             <div ref="userStatsChartRef" style="width: 100%; height: 100%;"></div>
             <el-empty v-if="!userStatsLoading && userStatsData.length === 0" description="暂无数据" />
           </div>
@@ -84,13 +84,13 @@
     </el-row>
 
     <!-- Response Time Stats -->
-    <el-row :gutter="20">
+    <el-row :gutter="20" class="charts-row-line">
       <el-col :span="24">
         <el-card shadow="hover" class="chart-card">
           <template #header>
             <span>响应时间统计</span>
           </template>
-          <div v-loading="responseTimeLoading" class="chart-container" style="height: 400px;">
+          <div v-loading="responseTimeLoading" class="chart-container">
             <div ref="responseTimeChartRef" style="width: 100%; height: 100%;"></div>
             <el-empty v-if="!responseTimeLoading && responseTimeData.length === 0" description="暂无数据" />
           </div>
@@ -112,9 +112,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import * as echarts from 'echarts'
+import { CHART_RESIZE_DELAY } from '@/constants/charts'
 import { 
   DocumentAdd, 
   SuccessFilled,
@@ -535,12 +536,22 @@ const refreshData = async () => {
 }
 
 // Lifecycle hooks
-onMounted(() => {
+onMounted(async () => {
+  await nextTick()
+  
   // Initialize all charts
   initStatusChart()
   initPriorityChart()
   initUserStatsChart()
   initResponseTimeChart()
+  
+  // Resize charts after initialization to match containers
+  setTimeout(() => {
+    statusChart?.resize()
+    priorityChart?.resize()
+    userStatsChart?.resize()
+    responseTimeChart?.resize()
+  }, CHART_RESIZE_DELAY)
   
   // Fetch initial data
   refreshData()
@@ -571,15 +582,21 @@ onUnmounted(() => {
 <style scoped>
 .statistics {
   animation: fadeIn 0.3s ease-in;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
 }
 
 .filter-card {
   margin-bottom: 20px;
   border-radius: 8px;
+  flex-shrink: 0;
 }
 
 .stats-overview {
   margin-bottom: 20px;
+  flex-shrink: 0;
 }
 
 .stat-card {
@@ -624,14 +641,80 @@ onUnmounted(() => {
 }
 
 .chart-card {
-  margin-bottom: 20px;
   border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin-bottom: 0;
+}
+
+.chart-card :deep(.el-card__body) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 20px;
 }
 
 .chart-container {
-  height: 350px;
+  flex: 1;
   width: 100%;
+  min-height: 280px;
   position: relative;
+  display: flex;
+}
+
+.chart-container > div {
+  flex: 1;
+  min-height: 0;
+}
+
+/* First row of charts (2 pie charts) - flex with equal distribution */
+.statistics .charts-row-pie {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.statistics .charts-row-pie .el-col {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Second row (user stats bar chart) - flex with larger portion */
+.statistics .charts-row-bar {
+  flex: 1.2;
+  min-height: 0;
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.statistics .charts-row-bar .el-col {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Third row (response time chart) - flex with larger portion */
+.statistics .charts-row-line {
+  flex: 1.2;
+  min-height: 0;
+  display: flex;
+  margin-bottom: 0;
+}
+
+.statistics .charts-row-line .el-col {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Error alert at the bottom */
+.statistics > :deep(.el-alert) {
+  flex-shrink: 0;
+  margin-top: 20px;
 }
 
 @keyframes fadeIn {
