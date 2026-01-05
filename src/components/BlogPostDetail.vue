@@ -26,7 +26,8 @@ marked.setOptions({
 async function loadPost() {
   loading.value = true
   error.value = ''
-  // Note: route.params.slug contains the post ID (parameter name kept for backward compatibility)
+  // Note: route.params.slug contains the post ID 
+  // (parameter name 'slug' is kept for backward compatibility with existing URLs)
   const postId = route.params.slug
   
   try {

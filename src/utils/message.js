@@ -35,7 +35,10 @@ export function showMessage(message, type = 'info') {
   setTimeout(() => {
     toast.style.animation = 'slideOut 0.3s ease-out'
     setTimeout(() => {
-      document.body.removeChild(toast)
+      // 检查元素是否仍在DOM中
+      if (toast.parentNode) {
+        document.body.removeChild(toast)
+      }
     }, 300)
   }, 3000)
 }
