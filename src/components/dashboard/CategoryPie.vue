@@ -30,6 +30,8 @@ const chartRef = ref(null)
 let chartInstance = null
 
 // Chart resize delay for proper initialization
+// ECharts needs time for the DOM to fully render and calculate container dimensions
+// 200ms provides sufficient time for flexbox layout calculations and browser reflow
 const CHART_RESIZE_DELAY = 200
 
 const initChart = () => {

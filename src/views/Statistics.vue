@@ -40,7 +40,7 @@
     </el-row>
 
     <!-- Charts Section -->
-    <el-row :gutter="20">
+    <el-row :gutter="20" class="charts-row-pie">
       <!-- Status Distribution Pie Chart -->
       <el-col :xs="24" :md="12">
         <el-card shadow="hover" class="chart-card">
@@ -69,7 +69,7 @@
     </el-row>
 
     <!-- User Handling Stats -->
-    <el-row :gutter="20">
+    <el-row :gutter="20" class="charts-row-bar">
       <el-col :span="24">
         <el-card shadow="hover" class="chart-card">
           <template #header>
@@ -84,7 +84,7 @@
     </el-row>
 
     <!-- Response Time Stats -->
-    <el-row :gutter="20">
+    <el-row :gutter="20" class="charts-row-line">
       <el-col :span="24">
         <el-card shadow="hover" class="chart-card">
           <template #header>
@@ -168,6 +168,8 @@ let userStatsChart = null
 let responseTimeChart = null
 
 // Chart resize delay for proper initialization
+// ECharts needs time for the DOM to fully render and calculate container dimensions
+// 200ms provides sufficient time for flexbox layout calculations and browser reflow
 const CHART_RESIZE_DELAY = 200
 
 // Fetch overview statistics
@@ -672,42 +674,42 @@ onUnmounted(() => {
 }
 
 /* First row of charts (2 pie charts) - flex with equal distribution */
-.statistics > :deep(.el-row:nth-child(3)) {
+.statistics .charts-row-pie {
   flex: 1;
   min-height: 0;
   display: flex;
   margin-bottom: 20px;
 }
 
-.statistics > :deep(.el-row:nth-child(3) .el-col) {
+.statistics .charts-row-pie .el-col {
   display: flex;
   flex-direction: column;
   min-height: 0;
 }
 
 /* Second row (user stats bar chart) - flex with larger portion */
-.statistics > :deep(.el-row:nth-child(4)) {
+.statistics .charts-row-bar {
   flex: 1.2;
   min-height: 0;
   display: flex;
   margin-bottom: 20px;
 }
 
-.statistics > :deep(.el-row:nth-child(4) .el-col) {
+.statistics .charts-row-bar .el-col {
   display: flex;
   flex-direction: column;
   min-height: 0;
 }
 
 /* Third row (response time chart) - flex with larger portion */
-.statistics > :deep(.el-row:nth-child(5)) {
+.statistics .charts-row-line {
   flex: 1.2;
   min-height: 0;
   display: flex;
   margin-bottom: 0;
 }
 
-.statistics > :deep(.el-row:nth-child(5) .el-col) {
+.statistics .charts-row-line .el-col {
   display: flex;
   flex-direction: column;
   min-height: 0;
