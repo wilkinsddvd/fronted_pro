@@ -10,6 +10,7 @@ import Register from '../components/Register.vue'
 
 const routes = [
   { path: '/', name: 'Home', component: BlogPostList },
+  // Note: 'slug' parameter actually contains the post ID (for backward compatibility)
   { path: '/post/:slug', name: 'PostDetail', component: BlogPostDetail, props: true },
   { path: '/categories', name: 'Categories', component: CategoryList },
   { path: '/tags', name: 'Tags', component: TagList },
