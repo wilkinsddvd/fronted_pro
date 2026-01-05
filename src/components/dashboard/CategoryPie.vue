@@ -14,6 +14,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import * as echarts from 'echarts'
+import { CHART_RESIZE_DELAY } from '@/constants/charts'
 
 const props = defineProps({
   data: {
@@ -28,11 +29,6 @@ const props = defineProps({
 
 const chartRef = ref(null)
 let chartInstance = null
-
-// Chart resize delay for proper initialization
-// ECharts needs time for the DOM to fully render and calculate container dimensions
-// 200ms provides sufficient time for flexbox layout calculations and browser reflow
-const CHART_RESIZE_DELAY = 200
 
 const initChart = () => {
   if (!chartRef.value) return

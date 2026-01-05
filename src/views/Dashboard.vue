@@ -189,9 +189,10 @@ const fetchTrendData = async (range = 'week') => {
     const newTickets = []
     const completedTickets = []
     
+    const baseDate = new Date()
     for (let i = days - 1; i >= 0; i--) {
-      const date = new Date()
-      date.setDate(date.getDate() - i)
+      const date = new Date(baseDate)
+      date.setDate(baseDate.getDate() - i)
       dates.push(date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }))
       newTickets.push(Math.floor(Math.random() * 30) + 10)
       completedTickets.push(Math.floor(Math.random() * 25) + 15)

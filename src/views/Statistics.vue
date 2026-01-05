@@ -115,6 +115,7 @@
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import * as echarts from 'echarts'
+import { CHART_RESIZE_DELAY } from '@/constants/charts'
 import { 
   DocumentAdd, 
   SuccessFilled,
@@ -166,11 +167,6 @@ let statusChart = null
 let priorityChart = null
 let userStatsChart = null
 let responseTimeChart = null
-
-// Chart resize delay for proper initialization
-// ECharts needs time for the DOM to fully render and calculate container dimensions
-// 200ms provides sufficient time for flexbox layout calculations and browser reflow
-const CHART_RESIZE_DELAY = 200
 
 // Fetch overview statistics
 const fetchOverviewStats = async () => {
