@@ -1,23 +1,30 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import BlogPostList from '../components/BlogPostList.vue'
-import BlogPostDetail from '../components/BlogPostDetail.vue'
-import CategoryList from '../components/CategoryList.vue'
-import TagList from '../components/TagList.vue'
-import ArchiveList from '../components/ArchiveList.vue'
-import AboutMe from '../components/AboutMe.vue'
+import DashboardLayout from '../components/dashboard/DashboardLayout.vue'
+import Dashboard from '../views/Dashboard.vue'
+import Tickets from '../views/Tickets.vue'
+import QuickReply from '../views/QuickReply.vue'
+import CategoryManagement from '../views/CategoryManagement.vue'
+import Statistics from '../views/Statistics.vue'
+import Settings from '../views/Settings.vue'
 import Login from '../components/Login.vue'
 import Register from '../components/Register.vue'
 
 const routes = [
-  { path: '/', name: 'Home', component: BlogPostList },
-  // Note: 'slug' parameter actually contains the post ID (for backward compatibility)
-  { path: '/post/:slug', name: 'PostDetail', component: BlogPostDetail, props: true },
-  { path: '/categories', name: 'Categories', component: CategoryList },
-  { path: '/tags', name: 'Tags', component: TagList },
-  { path: '/archives', name: 'Archives', component: ArchiveList },
-  { path: '/about', name: 'About', component: AboutMe },
-  { path: '/login', component: Login },
-  { path: '/register', component: Register },
+  {
+    path: '/',
+    component: DashboardLayout,
+    redirect: '/dashboard',
+    children: [
+      { path: '/dashboard', name: 'Dashboard', component: Dashboard },
+      { path: '/tickets', name: 'Tickets', component: Tickets },
+      { path: '/quick-reply', name: 'QuickReply', component: QuickReply },
+      { path: '/categories', name: 'Categories', component: CategoryManagement },
+      { path: '/statistics', name: 'Statistics', component: Statistics },
+      { path: '/settings', name: 'Settings', component: Settings }
+    ]
+  },
+  { path: '/login', name: 'Login', component: Login },
+  { path: '/register', name: 'Register', component: Register }
 ]
 
 export default createRouter({

@@ -211,4 +211,152 @@ export const getSelf = () => {
   })
 }
 
+// ==================== 仪表盘相关API ====================
+
+/**
+ * 获取仪表盘统计数据
+ */
+export const getDashboardStats = () => {
+  return request({
+    url: '/dashboard/stats',
+    method: 'get'
+  })
+}
+
+/**
+ * 获取工单趋势数据
+ * @param {Object} params - 查询参数
+ * @param {string} params.range - 时间范围: week/month
+ */
+export const getTicketTrend = (params = {}) => {
+  return request({
+    url: '/dashboard/trend',
+    method: 'get',
+    params
+  })
+}
+
+/**
+ * 获取工单分类统计
+ */
+export const getCategoryStats = () => {
+  return request({
+    url: '/dashboard/category-stats',
+    method: 'get'
+  })
+}
+
+// ==================== 工单管理相关API ====================
+
+/**
+ * 获取工单列表
+ * @param {Object} params - 查询参数
+ * @param {number} params.page - 页码
+ * @param {number} params.size - 每页数量
+ * @param {string} params.status - 状态筛选
+ * @param {string} params.search - 搜索关键词
+ */
+export const getTickets = (params = {}) => {
+  return request({
+    url: '/tickets',
+    method: 'get',
+    params
+  })
+}
+
+/**
+ * 获取工单详情
+ * @param {number} id - 工单ID
+ */
+export const getTicket = (id) => {
+  return request({
+    url: `/tickets/${id}`,
+    method: 'get'
+  })
+}
+
+/**
+ * 创建工单
+ * @param {Object} data - 工单数据
+ */
+export const createTicket = (data) => {
+  return request({
+    url: '/tickets',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 更新工单
+ * @param {number} id - 工单ID
+ * @param {Object} data - 更新数据
+ */
+export const updateTicket = (id, data) => {
+  return request({
+    url: `/tickets/${id}`,
+    method: 'put',
+    data
+  })
+}
+
+/**
+ * 删除工单
+ * @param {number} id - 工单ID
+ */
+export const deleteTicket = (id) => {
+  return request({
+    url: `/tickets/${id}`,
+    method: 'delete'
+  })
+}
+
+// ==================== 快速回复相关API ====================
+
+/**
+ * 获取快速回复列表
+ */
+export const getQuickReplies = () => {
+  return request({
+    url: '/quick-replies',
+    method: 'get'
+  })
+}
+
+/**
+ * 创建快速回复
+ * @param {Object} data - 快速回复数据
+ */
+export const createQuickReply = (data) => {
+  return request({
+    url: '/quick-replies',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 更新快速回复
+ * @param {number} id - 快速回复ID
+ * @param {Object} data - 更新数据
+ */
+export const updateQuickReply = (id, data) => {
+  return request({
+    url: `/quick-replies/${id}`,
+    method: 'put',
+    data
+  })
+}
+
+/**
+ * 删除快速回复
+ * @param {number} id - 快速回复ID
+ */
+export const deleteQuickReply = (id) => {
+  return request({
+    url: `/quick-replies/${id}`,
+    method: 'delete'
+  })
+}
+
 export default request
