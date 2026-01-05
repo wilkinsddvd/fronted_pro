@@ -359,4 +359,42 @@ export const deleteQuickReply = (id) => {
   })
 }
 
+// ==================== 分类管理相关API ====================
+
+/**
+ * 创建分类
+ * @param {Object} data - 分类数据
+ */
+export const createCategory = (data) => {
+  return request({
+    url: '/categories',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 更新分类
+ * @param {number} id - 分类ID
+ * @param {Object} data - 更新数据
+ */
+export const updateCategory = (id, data) => {
+  return request({
+    url: `/categories/${id}`,
+    method: 'put',
+    data
+  })
+}
+
+/**
+ * 删除分类
+ * @param {number} id - 分类ID
+ */
+export const deleteCategory = (id) => {
+  return request({
+    url: `/categories/${id}`,
+    method: 'delete'
+  })
+}
+
 export default request

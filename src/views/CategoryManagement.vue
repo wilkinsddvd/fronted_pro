@@ -39,7 +39,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getCategories } from '@/api/index.js'
+import { getCategories, deleteCategory } from '@/api/index.js'
 
 const categories = ref([])
 const loading = ref(false)
@@ -77,6 +77,7 @@ const handleDelete = async (row) => {
       type: 'warning'
     })
     
+    await deleteCategory(row.id)
     ElMessage.success('删除成功')
     fetchCategories()
   } catch (err) {
