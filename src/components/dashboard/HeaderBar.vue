@@ -69,6 +69,7 @@ const handleCommand = (command) => {
   left: 200px;
   right: 0;
   z-index: 100;
+  transition: left 0.3s;
 }
 
 .header-left h3 {
@@ -100,5 +101,21 @@ const handleCommand = (command) => {
   margin: 0 8px;
   font-size: 14px;
   color: #606266;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .header-bar {
+    left: 0;
+    padding: 0 12px;
+  }
+  
+  .header-left h3 {
+    font-size: 16px;
+  }
+  
+  .username {
+    display: none;
+  }
 }
 </style>

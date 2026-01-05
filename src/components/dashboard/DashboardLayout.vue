@@ -24,10 +24,22 @@ import HeaderBar from './HeaderBar.vue'
 .main-container {
   margin-left: 200px;
   min-height: 100vh;
+  transition: margin-left 0.3s;
 }
 
 .content-wrapper {
   padding: 84px 24px 24px 24px;
   min-height: calc(100vh - 60px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .main-container {
+    margin-left: 0;
+  }
+  
+  .content-wrapper {
+    padding: 84px 12px 12px 12px;
+  }
 }
 </style>
