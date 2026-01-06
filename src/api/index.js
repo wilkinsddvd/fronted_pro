@@ -1,12 +1,32 @@
 import axios from 'axios'
 
-// 创建axios实例
+/**
+ * HTTP请求基础服务封装
+ * 
+ * 实现思路：
+ * 1. 创建axios实例，统一配置baseURL为'/api'，所有请求都会自动添加此前缀
+ * 2. 设置请求超时时间为10秒，避免长时间等待
+ * 3. 配置请求拦截器：在发送请求前自动添加认证信息（如token）到请求头
+ * 4. 配置响应拦截器：统一处理响应数据和错误，简化业务代码中的错误处理
+ * 5. 开发环境下，vite.config.js中配置的proxy会将 /api 请求代理到后端服务器
+ *    - 前端请求：/api/users -> 开发服务器代理 -> http://localhost:8000/users
+ *    - pathRewrite配置会去掉/api前缀，确保后端接收到正确的路径
+ */
+
+// 创建axios实例，配置基础URL和超时时间
 const request = axios.create({
-  baseURL: '/api',
-  timeout: 10000,
+  baseURL: '/api', // 所有请求的基础路径，会自动添加到请求URL前面
+  timeout: 10000, // 请求超时时间（毫秒）
 })
 
-// 请求拦截器
+/**
+ * 请求拦截器
+ * 作用：在请求发送到服务器之前，统一添加认证信息等配置
+ * 实现思路：
+ * 1. 从localStorage获取用户信息
+ * 2. 如果用户已登录，自动在请求头中添加认证信息
+ * 3. 支持Bearer Token或自定义的User-ID认证方式
+ */
 request.interceptors.request.use(
   config => {
     // 可在此添加token等认证信息
@@ -31,7 +51,15 @@ request.interceptors.request.use(
   }
 )
 
-// 响应拦截器
+/**
+ * 响应拦截器
+ * 作用：统一处理服务器返回的响应数据和错误
+ * 实现思路：
+ * 1. 检查响应数据中的状态码（假设后端返回格式为 {code, data, msg}）
+ * 2. 如果code不是200或201，认为是业务错误，统一处理
+ * 3. 网络错误（如超时、连接失败）会在error回调中处理
+ * 4. 这样可以简化业务代码，只需关注正常的数据处理逻辑
+ */
 request.interceptors.response.use(
   response => {
     const res = response.data
@@ -162,6 +190,32 @@ export const getSiteInfo = () => {
 }
 
 // ==================== 用户认证相关API ====================
+
+/**
+ * 获取用户信息（基础GET请求示例）
+ * @param {number} id - 用户ID
+ * @returns {Promise} 返回用户信息
+ * 
+ * 使用示例：
+ * import { getUser } from '@/api'
+ * getUser(1).then(res => {
+ *   console.log(res.data) // 用户信息
+ * }).catch(err => {
+ *   console.error(err)
+ * })
+ * 
+ * 实现思路：
+ * 1. 通过axios实例发起GET请求到 /api/users/:id
+ * 2. 由于baseURL为'/api'，实际请求路径为 /api/users/:id
+ * 3. 开发环境下，vite.config.js中的proxy会将请求代理到 http://localhost:8000/users/:id
+ * 4. 请求和响应会经过拦截器处理（添加认证信息、统一错误处理等）
+ */
+export const getUser = (id) => {
+  return request({
+    url: `/users/${id}`,
+    method: 'get'
+  })
+}
 
 /**
  * 用户登录
