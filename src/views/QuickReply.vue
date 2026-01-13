@@ -106,10 +106,7 @@ const fetchReplies = async () => {
   loading.value = true
   error.value = ''
   try {
-    const params = {
-      page: currentPage.value,
-      size: pageSize.value
-    }
+    const params = {}
     
     if (searchQuery.value) {
       params.search = searchQuery.value
@@ -122,14 +119,14 @@ const fetchReplies = async () => {
     const res = await getQuickReplies(params)
     if (res && res.data) {
       const data = res.data.items || res.data.list || res.data || []
-      // 支持分页和非分页数据
+      // 如果API返回的是数组（非分页），在客户端进行分页
       if (Array.isArray(data)) {
-        // 如果没有分页信息，手动分页
         const start = (currentPage.value - 1) * pageSize.value
         const end = start + pageSize.value
         replies.value = data.slice(start, end)
         total.value = data.length
       } else {
+        // API返回分页数据
         replies.value = data.items || data.list || []
         total.value = data.total || 0
       }
@@ -186,7 +183,7 @@ const handleSubmit = async (data) => {
     }
     fetchReplies()
   } catch (err) {
-    ElMessage.error((data.id ? '更新' : '创建') + '失败: ' + (err.message || '网络错误'))
+    ElMessage.error(`${data.id ? '更新' : '创建'}失败: ${err.message || '网络错误'}`)
     throw err
   }
 }

@@ -203,7 +203,7 @@ const handleSubmit = async (data) => {
     }
     fetchTickets()
   } catch (err) {
-    ElMessage.error((data.id ? '更新' : '创建') + '失败: ' + (err.message || '网络错误'))
+    ElMessage.error(`${data.id ? '更新' : '创建'}失败: ${err.message || '网络错误'}`)
     throw err
   }
 }
