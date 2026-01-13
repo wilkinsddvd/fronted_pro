@@ -144,7 +144,7 @@ const fetchTickets = async () => {
 
     const res = await getTickets(params)
     if (res && res.data) {
-      tickets.value = res.data.items || res.data.list || []
+      tickets.value = res.data.tickets || res.data.items || res.data.list || []
       total.value = res.data.total || 0
     }
   } catch (err) {
