@@ -118,16 +118,28 @@ const fetchReplies = async () => {
 
     const res = await getQuickReplies(params)
     if (res && res.data) {
-      const data = res.data.items || res.data.list || res.data || []
+      // 优先从 quick_replies 字段获取数据
+      const data = res.data.quick_replies || res.data.items || res.data.list || res.data || []
+      
+      // 字段映射函数：将 use_count 映射为 useCount
+      const mapFields = (item) => {
+        return {
+          ...item,
+          useCount: item.use_count ?? item.useCount ?? 0
+        }
+      }
+      
       // 如果API返回的是数组（非分页），在客户端进行分页
       if (Array.isArray(data)) {
+        const mappedData = data.map(mapFields)
         const start = (currentPage.value - 1) * pageSize.value
         const end = start + pageSize.value
-        replies.value = data.slice(start, end)
-        total.value = data.length
+        replies.value = mappedData.slice(start, end)
+        total.value = mappedData.length
       } else {
         // API返回分页数据
-        replies.value = data.items || data.list || []
+        const items = data.items || data.list || []
+        replies.value = items.map(mapFields)
         total.value = data.total || 0
       }
     }
