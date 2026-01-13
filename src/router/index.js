@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import DashboardLayout from '../components/dashboard/DashboardLayout.vue'
 import Dashboard from '../views/Dashboard.vue'
 import Tickets from '../views/Tickets.vue'
+import TicketDetail from '../views/TicketDetail.vue'
 import QuickReply from '../views/QuickReply.vue'
 import CategoryManagement from '../views/CategoryManagement.vue'
 import Statistics from '../views/Statistics.vue'
@@ -17,6 +18,7 @@ const routes = [
     children: [
       { path: '/dashboard', name: 'Dashboard', component: Dashboard },
       { path: '/tickets', name: 'Tickets', component: Tickets },
+      { path: '/tickets/:id', name: 'TicketDetail', component: TicketDetail },
       { path: '/quick-reply', name: 'QuickReply', component: QuickReply },
       { path: '/categories', name: 'Categories', component: CategoryManagement },
       { path: '/statistics', name: 'Statistics', component: Statistics },
