@@ -7,30 +7,77 @@
           <el-button type="primary" @click="handleCreate">新建模板</el-button>
         </div>
       </template>
-      
-      <div v-loading="loading">
-        <el-table :data="replies" stripe style="width: 100%">
-          <el-table-column prop="id" label="ID" width="80" />
-          <el-table-column prop="title" label="标题" width="200" />
-          <el-table-column prop="content" label="内容" min-width="300" show-overflow-tooltip />
-          <el-table-column prop="category" label="分类" width="120" />
-          <el-table-column prop="useCount" label="使用次数" width="120" />
-          <el-table-column label="操作" width="180" fixed="right">
-            <template #default="{ row }">
-              <el-button size="small" type="primary" @click="handleEdit(row)">编辑</el-button>
-              <el-button size="small" type="danger" @click="handleDelete(row)">删除</el-button>
+
+      <!-- 搜索 -->
+      <el-row :gutter="20" style="margin-bottom: 20px">
+        <el-col :xs="24" :sm="12" :md="8">
+          <el-input
+            v-model="searchQuery"
+            placeholder="搜索标题或内容"
+            clearable
+            @clear="handleSearch"
+            @keyup.enter="handleSearch"
+          >
+            <template #prefix>
+              <el-icon><Search /></el-icon>
             </template>
-          </el-table-column>
-        </el-table>
-      </div>
+            <template #append>
+              <el-button :icon="Search" @click="handleSearch" />
+            </template>
+          </el-input>
+        </el-col>
+        <el-col :xs="24" :sm="12" :md="8">
+          <el-select
+            v-model="categoryFilter"
+            placeholder="筛选分类"
+            clearable
+            @change="handleSearch"
+            style="width: 100%"
+          >
+            <el-option label="常见问题" value="faq" />
+            <el-option label="技术支持" value="technical" />
+            <el-option label="售后服务" value="after_sales" />
+            <el-option label="其他" value="other" />
+          </el-select>
+        </el-col>
+      </el-row>
+
+      <!-- 快速回复表格 -->
+      <QuickReplyTable
+        :replies="replies"
+        :loading="loading"
+        @edit="handleEdit"
+        @delete="handleDelete"
+      />
+
+      <!-- 分页 -->
+      <el-pagination
+        v-model:current-page="currentPage"
+        v-model:page-size="pageSize"
+        :total="total"
+        :page-sizes="[10, 20, 50, 100]"
+        layout="total, sizes, prev, pager, next, jumper"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        style="margin-top: 20px; justify-content: flex-end;"
+      />
     </el-card>
 
+    <!-- 快速回复表单 -->
+    <QuickReplyForm
+      v-model:visible="formVisible"
+      :reply="currentReply"
+      @submit="handleSubmit"
+    />
+
+    <!-- 错误提示 -->
     <el-alert
       v-if="error"
       :title="error"
       type="error"
       show-icon
-      :closable="false"
+      :closable="true"
+      @close="error = ''"
       style="margin-top: 20px;"
     />
   </div>
@@ -39,19 +86,53 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getQuickReplies, deleteQuickReply } from '@/api/index.js'
+import { Search } from '@element-plus/icons-vue'
+import QuickReplyTable from '@/components/quick-reply/QuickReplyTable.vue'
+import QuickReplyForm from '@/components/quick-reply/QuickReplyForm.vue'
+import { getQuickReplies, createQuickReply, updateQuickReply, deleteQuickReply } from '@/api/index.js'
 
 const replies = ref([])
 const loading = ref(false)
 const error = ref('')
+const currentPage = ref(1)
+const pageSize = ref(10)
+const total = ref(0)
+const searchQuery = ref('')
+const categoryFilter = ref('')
+const formVisible = ref(false)
+const currentReply = ref(null)
 
 const fetchReplies = async () => {
   loading.value = true
   error.value = ''
   try {
-    const res = await getQuickReplies()
+    const params = {
+      page: currentPage.value,
+      size: pageSize.value
+    }
+    
+    if (searchQuery.value) {
+      params.search = searchQuery.value
+    }
+    
+    if (categoryFilter.value) {
+      params.category = categoryFilter.value
+    }
+
+    const res = await getQuickReplies(params)
     if (res && res.data) {
-      replies.value = res.data.items || res.data.list || res.data || []
+      const data = res.data.items || res.data.list || res.data || []
+      // 支持分页和非分页数据
+      if (Array.isArray(data)) {
+        // 如果没有分页信息，手动分页
+        const start = (currentPage.value - 1) * pageSize.value
+        const end = start + pageSize.value
+        replies.value = data.slice(start, end)
+        total.value = data.length
+      } else {
+        replies.value = data.items || data.list || []
+        total.value = data.total || 0
+      }
     }
   } catch (err) {
     console.error('获取快速回复列表失败:', err)
@@ -61,12 +142,19 @@ const fetchReplies = async () => {
   }
 }
 
+const handleSearch = () => {
+  currentPage.value = 1
+  fetchReplies()
+}
+
 const handleCreate = () => {
-  ElMessage.info('创建快速回复功能开发中')
+  currentReply.value = null
+  formVisible.value = true
 }
 
 const handleEdit = (row) => {
-  ElMessage.info(`编辑快速回复 #${row.id}`)
+  currentReply.value = { ...row }
+  formVisible.value = true
 }
 
 const handleDelete = async (row) => {
@@ -85,6 +173,31 @@ const handleDelete = async (row) => {
       ElMessage.error('删除失败: ' + (err.message || '网络错误'))
     }
   }
+}
+
+const handleSubmit = async (data) => {
+  try {
+    if (data.id) {
+      await updateQuickReply(data.id, data)
+      ElMessage.success('更新成功')
+    } else {
+      await createQuickReply(data)
+      ElMessage.success('创建成功')
+    }
+    fetchReplies()
+  } catch (err) {
+    ElMessage.error((data.id ? '更新' : '创建') + '失败: ' + (err.message || '网络错误'))
+    throw err
+  }
+}
+
+const handleSizeChange = () => {
+  currentPage.value = 1
+  fetchReplies()
+}
+
+const handleCurrentChange = () => {
+  fetchReplies()
 }
 
 onMounted(() => {
