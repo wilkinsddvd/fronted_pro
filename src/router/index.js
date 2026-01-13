@@ -2,7 +2,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 import DashboardLayout from '../components/dashboard/DashboardLayout.vue'
 import Dashboard from '../views/Dashboard.vue'
 import Tickets from '../views/Tickets.vue'
+import TicketList from '../views/TicketList.vue'
+import TicketDetail from '../views/TicketDetail.vue'
 import QuickReply from '../views/QuickReply.vue'
+import QuickReplyList from '../views/QuickReplyList.vue'
 import CategoryManagement from '../views/CategoryManagement.vue'
 import Statistics from '../views/Statistics.vue'
 import Settings from '../views/Settings.vue'
@@ -16,8 +19,9 @@ const routes = [
     redirect: '/dashboard',
     children: [
       { path: '/dashboard', name: 'Dashboard', component: Dashboard },
-      { path: '/tickets', name: 'Tickets', component: Tickets },
-      { path: '/quick-reply', name: 'QuickReply', component: QuickReply },
+      { path: '/tickets', name: 'Tickets', component: TicketList },
+      { path: '/tickets/:id', name: 'TicketDetail', component: TicketDetail },
+      { path: '/quick-reply', name: 'QuickReply', component: QuickReplyList },
       { path: '/categories', name: 'Categories', component: CategoryManagement },
       { path: '/statistics', name: 'Statistics', component: Statistics },
       { path: '/settings', name: 'Settings', component: Settings }
