@@ -125,7 +125,7 @@ const fetchReplies = async () => {
       const mapFields = (item) => {
         return {
           ...item,
-          useCount: item.use_count ?? item.useCount
+          useCount: item.use_count ?? item.useCount ?? 0
         }
       }
       
