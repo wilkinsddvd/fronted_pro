@@ -1,29 +1,51 @@
-# 使用 Node.js 20 LTS 版本作为基础镜像
-FROM node:20 AS build-stage
-
-# 设置容器中的工作目录
+# 构建阶段：使用 Node 20（满足 Vite 要求）
+FROM node:20-alpine AS build
 WORKDIR /app
 
-# 将 package.json 和 package-lock.json 复制到容器中
-COPY package.json package-lock.json ./
+# 复制依赖并安装（优先使用 ci）
+COPY package*.json ./
+RUN npm ci --silent || npm install --silent
 
-# 安装项目依赖
-RUN npm install
-
-# 将项目源文件复制到容器中
+# 复制源码并构建
 COPY . .
-
-# 构建项目（生产环境）
 RUN npm run build
 
-# 第二阶段：使用 Nginx 作为服务器
-FROM nginx:stable AS production-stage
+# 运行阶段：Nginx，容器内监听 3000（避免宿主 80/443 冲突）
+FROM nginx:stable-alpine AS production
+ENV FRONTEND_PORT=3000
 
-# 复制第一阶段生成的构建文件到 Nginx 静态内容目录
-COPY --from=build-stage /app/dist /usr/share/nginx/html
+# 安装 curl（可选，用于健康检查）
+RUN apk add --no-cache curl
 
-# 暴露 80 端口
-EXPOSE 80
+# 替换默认配置为监听 3000 的简单 SPA 配置
+RUN rm -f /etc/nginx/conf.d/default.conf \
+ && printf '%s\n' \
+'server {' \
+'    listen 3000 default_server;' \
+'    listen [::]:3000 default_server;' \
+'    server_name _;' \
+'    root /usr/share/nginx/html;' \
+'    index index.html;' \
+'    location / {' \
+'        try_files $uri $uri/ /index.html;' \
+'    }' \
+'    location ~* \.(?:css|js|json|xml|svg|ttf|woff|woff2|eot|otf|jpg|jpeg|png|gif|ico)$ {' \
+'        expires 7d;' \
+'        add_header Cache-Control "public, must-revalidate, proxy-revalidate";' \
+'    }' \
+'    gzip on;' \
+'    gzip_types text/plain application/javascript text/css application/json image/svg+xml application/xml;' \
+'}' \
+> /etc/nginx/conf.d/default.conf
 
-# 启动 Nginx 服务
+# 复制构建产物
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# 暴露容器内部端口（运行时映射到宿主任意端口）
+EXPOSE 3000
+
+# 可选健康检查
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3000/ || exit 1
+
 CMD ["nginx", "-g", "daemon off;"]
