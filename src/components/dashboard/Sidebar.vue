@@ -35,6 +35,10 @@
         <el-icon><Setting /></el-icon>
         <span>系统配置</span>
       </el-menu-item>
+      <el-menu-item index="/profile-settings">
+        <el-icon><User /></el-icon>
+        <span>个人设置</span>
+      </el-menu-item>
     </el-menu>
   </div>
 </template>
@@ -42,7 +46,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { DataLine, Tickets, ChatLineSquare, FolderOpened, TrendCharts, Setting } from '@element-plus/icons-vue'
+import { DataLine, Tickets, ChatLineSquare, FolderOpened, TrendCharts, Setting, User } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const activeMenu = computed(() => route.path)
