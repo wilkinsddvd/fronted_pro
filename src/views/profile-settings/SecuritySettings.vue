@@ -281,11 +281,9 @@ const handleSubmit = async () => {
     // 触发父组件事件
     emit('change-password', submitData)
     
-    // 延迟重置表单
-    setTimeout(() => {
-      handleReset()
-      saveLoading.value = false
-    }, 1000)
+    // 重置表单并关闭loading
+    handleReset()
+    saveLoading.value = false
   } catch (error) {
     console.error('Form validation failed:', error)
     ElMessage.warning('请检查表单填写是否正确')

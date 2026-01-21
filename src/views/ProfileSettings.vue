@@ -167,9 +167,6 @@ const handleChangePassword = async (data) => {
     // 模拟密码修改（实际项目中应调用真实API）
     // await changePassword(data)
     
-    // 模拟延迟
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
     ElMessage.success('密码修改成功，请重新登录')
     
     // 实际项目中应跳转到登录页

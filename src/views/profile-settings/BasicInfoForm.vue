@@ -242,10 +242,8 @@ const handleSave = async () => {
     // 触发更新事件，由父组件处理实际的API调用
     emit('update', submitData)
     
-    // 延迟关闭加载状态（父组件会控制全局loading）
-    setTimeout(() => {
-      saveLoading.value = false
-    }, 500)
+    // 父组件会控制全局loading，这里立即关闭本地loading
+    saveLoading.value = false
   } catch (error) {
     console.error('Form validation failed:', error)
     ElMessage.warning('请检查表单填写是否正确')

@@ -177,10 +177,8 @@ const handleSave = async () => {
     // 触发父组件更新事件
     emit('update', submitData)
     
-    // 延迟关闭加载状态
-    setTimeout(() => {
-      saveLoading.value = false
-    }, 500)
+    // 父组件会控制全局loading，这里立即关闭本地loading
+    saveLoading.value = false
   } catch (error) {
     console.error('Save preferences error:', error)
     ElMessage.error('保存失败，请重试')
