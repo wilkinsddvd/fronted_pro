@@ -212,8 +212,6 @@ const handleSave = async () => {
     
     // 父组件会控制全局loading，这里立即关闭本地loading
     saveLoading.value = false
-    
-    ElMessage.success('个性化设置保存成功')
   } catch (error) {
     console.error('Save preferences error:', error)
     ElMessage.error('保存失败，请重试')
