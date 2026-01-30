@@ -6,11 +6,14 @@ import TicketDetail from '../views/TicketDetail.vue'
 import QuickReply from '../views/QuickReply.vue'
 import CategoryManagement from '../views/CategoryManagement.vue'
 import Statistics from '../views/Statistics.vue'
-import Settings from '../views/Settings.vue'
 import ProfileSettings from '../views/ProfileSettings.vue'
 import Login from '../components/Login.vue'
 import Register from '../components/Register.vue'
 
+/**
+ * 路由配置
+ * 定义应用的所有页面路由
+ */
 const routes = [
   {
     path: '/',
@@ -23,7 +26,7 @@ const routes = [
       { path: '/quick-reply', name: 'QuickReply', component: QuickReply },
       { path: '/categories', name: 'Categories', component: CategoryManagement },
       { path: '/statistics', name: 'Statistics', component: Statistics },
-      { path: '/settings', name: 'Settings', component: Settings },
+      // 个人设置页面路由
       { path: '/profile-settings', name: 'ProfileSettings', component: ProfileSettings }
     ]
   },
