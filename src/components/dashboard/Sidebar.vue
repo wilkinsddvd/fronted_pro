@@ -1,8 +1,11 @@
 <template>
   <div class="sidebar">
+    <!-- Logo 区域 -->
     <div class="logo-container">
       <h2>工单管理系统</h2>
     </div>
+    
+    <!-- 侧边栏菜单 -->
     <el-menu
       :default-active="activeMenu"
       class="sidebar-menu"
@@ -11,30 +14,37 @@
       active-text-color="#409EFF"
       :router="true"
     >
+      <!-- 数据概览 -->
       <el-menu-item index="/dashboard">
         <el-icon><DataLine /></el-icon>
         <span>数据概览</span>
       </el-menu-item>
+      
+      <!-- 工单管理 -->
       <el-menu-item index="/tickets">
         <el-icon><Tickets /></el-icon>
         <span>工单管理</span>
       </el-menu-item>
+      
+      <!-- 快速回复 -->
       <el-menu-item index="/quick-reply">
         <el-icon><ChatLineSquare /></el-icon>
         <span>快速回复</span>
       </el-menu-item>
+      
+      <!-- 分类管理 -->
       <el-menu-item index="/categories">
         <el-icon><FolderOpened /></el-icon>
         <span>分类管理</span>
       </el-menu-item>
+      
+      <!-- 数据统计 -->
       <el-menu-item index="/statistics">
         <el-icon><TrendCharts /></el-icon>
         <span>数据统计</span>
       </el-menu-item>
-      <el-menu-item index="/settings">
-        <el-icon><Setting /></el-icon>
-        <span>系统配置</span>
-      </el-menu-item>
+      
+      <!-- 个人设置 -->
       <el-menu-item index="/profile-settings">
         <el-icon><User /></el-icon>
         <span>个人设置</span>
@@ -46,9 +56,13 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { DataLine, Tickets, ChatLineSquare, FolderOpened, TrendCharts, Setting, User } from '@element-plus/icons-vue'
+import { DataLine, Tickets, ChatLineSquare, FolderOpened, TrendCharts, User } from '@element-plus/icons-vue'
 
 const route = useRoute()
+
+/**
+ * 根据当前路由计算激活的菜单项
+ */
 const activeMenu = computed(() => route.path)
 </script>
 

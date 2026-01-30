@@ -32,6 +32,9 @@ const route = useRoute()
 
 const username = ref('Admin')
 
+/**
+ * 根据当前路由计算页面标题
+ */
 const title = computed(() => {
   const titles = {
     '/dashboard': '数据概览',
@@ -39,18 +42,24 @@ const title = computed(() => {
     '/quick-reply': '快速回复',
     '/categories': '分类管理',
     '/statistics': '数据统计',
-    '/settings': '系统配置'
+    '/profile-settings': '个人设置'
   }
   return titles[route.path] || '工单管理系统'
 })
 
+/**
+ * 处理下拉菜单命令
+ * @param {string} command - 菜单命令
+ */
 const handleCommand = (command) => {
   if (command === 'logout') {
+    // 退出登录
     localStorage.removeItem('user')
     ElMessage.success('退出成功')
     router.push('/login')
   } else if (command === 'profile') {
-    ElMessage.info('个人中心功能开发中')
+    // 跳转到个人设置页面
+    router.push('/profile-settings')
   }
 }
 </script>

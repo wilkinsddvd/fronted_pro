@@ -93,25 +93,28 @@
         <div class="form-tip">在系统内显示通知消息</div>
       </el-form-item>
 
-      <!-- 保存按钮 -->
-      <el-form-item>
-        <el-button 
-          type="primary"
-          :loading="saveLoading"
-          @click="handleSave"
-        >
-          保存设置
-        </el-button>
-        <el-button @click="handleReset">
-          重置
-        </el-button>
+      <!-- 操作按钮区域 - 底部右对齐 -->
+      <el-form-item class="form-actions">
+        <div class="actions-wrapper">
+          <el-button @click="handleReset">
+            重置
+          </el-button>
+          <el-button 
+            type="primary"
+            :loading="saveLoading"
+            :disabled="!hasChanges"
+            @click="handleSave"
+          >
+            保存设置
+          </el-button>
+        </div>
       </el-form-item>
     </el-form>
   </el-card>
 </template>
 
 <script setup>
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Picture, Sunny, Moon, Monitor, Reading, Bell } from '@element-plus/icons-vue'
 
@@ -135,6 +138,7 @@ const emit = defineEmits(['update'])
 const formRef = ref(null)
 const saveLoading = ref(false)
 
+// 表单数据
 const formData = reactive({
   theme: 'light',
   language: 'zh-CN',
@@ -143,16 +147,42 @@ const formData = reactive({
   systemNotification: true
 })
 
+// 原始数据快照，用于检测变更
+const originalData = ref({})
+
+// ==================== 计算属性 ====================
+
+/**
+ * 检查表单数据是否有变更
+ * 用于控制保存按钮的禁用状态
+ */
+const hasChanges = computed(() => {
+  if (!originalData.value || Object.keys(originalData.value).length === 0) {
+    return false
+  }
+  
+  return (
+    formData.theme !== originalData.value.theme ||
+    formData.language !== originalData.value.language ||
+    formData.emailNotification !== originalData.value.emailNotification ||
+    formData.smsNotification !== originalData.value.smsNotification ||
+    formData.systemNotification !== originalData.value.systemNotification
+  )
+})
+
 // ==================== 监听 preferences 变化 ====================
 watch(() => props.preferences, (newVal) => {
   if (newVal) {
-    Object.assign(formData, {
+    const data = {
       theme: newVal.theme || 'light',
       language: newVal.language || 'zh-CN',
       emailNotification: newVal.emailNotification !== undefined ? newVal.emailNotification : true,
       smsNotification: newVal.smsNotification !== undefined ? newVal.smsNotification : false,
       systemNotification: newVal.systemNotification !== undefined ? newVal.systemNotification : true
-    })
+    }
+    Object.assign(formData, data)
+    // 保存原始数据快照
+    originalData.value = { ...data }
   }
 }, { immediate: true, deep: true })
 
@@ -176,6 +206,9 @@ const handleSave = async () => {
     
     // 触发父组件更新事件
     emit('update', submitData)
+    
+    // 更新原始数据快照
+    originalData.value = { ...submitData }
     
     // 父组件会控制全局loading，这里立即关闭本地loading
     saveLoading.value = false
@@ -243,5 +276,24 @@ const handleReset = () => {
 .personalization-form :deep(.el-form-item__content) {
   flex-direction: column;
   align-items: flex-start;
+}
+
+/* 操作按钮区域样式 */
+.form-actions {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid #ebeef5;
+}
+
+.form-actions :deep(.el-form-item__content) {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.actions-wrapper {
+  display: flex;
+  gap: 12px;
 }
 </style>
