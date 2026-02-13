@@ -27,7 +27,7 @@ async function handleLogin() {
     localStorage.setItem('user', JSON.stringify(res.data))
     showMessage('登录成功！', 'success')
     setTimeout(() => {
-      router.push('/')
+      router.push('/dashboard')
     }, 500)
   } catch (e) {
     error.value = e.message || '登录失败，请检查用户名和密码'

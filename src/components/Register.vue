@@ -32,7 +32,7 @@ async function handleRegister() {
     localStorage.setItem('user', JSON.stringify(res.data))
     showMessage('注册成功！', 'success')
     setTimeout(() => {
-      router.push('/')
+      router.push('/dashboard')
     }, 500)
   } catch (e) {
     error.value = e.message || '注册失败'

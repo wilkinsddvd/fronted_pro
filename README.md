@@ -1,25 +1,27 @@
 # front_pro
 
-Vue 3 + Vite 博客前端项目，完全对接后端API，无静态数据。
+Vue 3 + Vite 工单管理系统前端项目，完全对接后端API。
 
 ## 功能特性
 
-- ✅ 完全基于后端API的数据获取（文章、分类、标签、归档等）
-- ✅ 用户认证系统（登录、注册、登出）
-- ✅ 文章列表分页、搜索、过滤
-- ✅ 文章详情展示与Markdown渲染
-- ✅ 文章浏览量和点赞功能
-- ✅ 响应式设计与主题切换
+- ✅ 完全基于后端API的数据获取（工单、快速回复、仪表盘、统计等）
+- ✅ 用户认证系统（登录、注册、登出）with JWT Bearer Token
+- ✅ 工单管理（创建、编辑、删除、状态管理）
+- ✅ 快速回复模板管理
+- ✅ 数据统计与可视化（工单趋势、状态分布、优先级分布等）
+- ✅ 个人设置（基本信息、安全设置、隐私设置等）
+- ✅ 响应式设计
 - ✅ 统一的API调用封装与错误处理
+- ✅ 401未授权自动跳转登录
 
 ## 技术栈
 
 - Vue 3 (Composition API)
 - Vue Router 4
+- Element Plus (UI组件库)
 - Axios (HTTP客户端)
+- ECharts (数据可视化)
 - Vite (构建工具)
-- Marked (Markdown解析)
-- Highlight.js (代码高亮)
 
 ## 项目结构
 
@@ -55,20 +57,44 @@ server: {
 
 ## 后端API要求
 
-本项目依赖以下后端API端点（详见 https://github.com/wilkinsddvd/end_pro/tree/master/api）：
+本项目依赖以下后端API端点（详见 https://github.com/wilkinsddvd/end_pro）：
 
-- `GET /api/posts` - 获取文章列表（支持分页、搜索、过滤）
-- `GET /api/posts/:id` - 获取文章详情
-- `POST /api/posts/:id/view` - 增加文章浏览量
-- `POST /api/posts/:id/like` - 文章点赞
-- `GET /api/categories` - 获取分类列表
-- `GET /api/tags` - 获取标签列表
-- `GET /api/archive` - 获取归档数据
-- `GET /api/menus` - 获取菜单配置
-- `GET /api/siteinfo` - 获取站点信息
-- `POST /api/login` - 用户登录
-- `POST /api/register` - 用户注册
-- `POST /api/logout` - 用户登出
+**认证要求：** 除了 `/api/login` 和 `/api/register` 外，所有API端点都需要JWT Bearer Token认证。
+
+### 认证相关
+- `POST /api/login` - 用户登录（返回token）
+- `POST /api/register` - 用户注册（返回token）
+- `POST /api/logout` - 用户登出（需要认证）
+- `GET /api/self` - 获取当前用户信息（需要认证）
+
+### 工单管理
+- `GET /api/tickets` - 获取工单列表（需要认证，支持分页、搜索、过滤）
+- `GET /api/tickets/:id` - 获取工单详情（需要认证）
+- `POST /api/tickets` - 创建工单（需要认证）
+- `PUT /api/tickets/:id` - 更新工单（需要认证）
+- `DELETE /api/tickets/:id` - 删除工单（需要认证）
+
+### 快速回复
+- `GET /api/quick-replies` - 获取快速回复列表（需要认证）
+- `POST /api/quick-replies` - 创建快速回复（需要认证）
+- `PUT /api/quick-replies/:id` - 更新快速回复（需要认证）
+- `DELETE /api/quick-replies/:id` - 删除快速回复（需要认证）
+
+### 仪表盘
+- `GET /api/dashboard/stats` - 获取仪表盘统计数据（需要认证）
+- `GET /api/dashboard/trend` - 获取工单趋势数据（需要认证）
+- `GET /api/dashboard/category-stats` - 获取工单分类统计（需要认证）
+
+### 统计数据
+- `GET /api/statistics/overview` - 获取详细统计数据（需要认证）
+- `GET /api/statistics/status-distribution` - 获取工单状态分布（需要认证）
+- `GET /api/statistics/priority-distribution` - 获取工单优先级分布（需要认证）
+- `GET /api/statistics/user-handling` - 获取用户处理统计（需要认证）
+- `GET /api/statistics/response-time` - 获取响应时间统计（需要认证）
+
+### 站点配置
+- `GET /api/menus` - 获取菜单配置（需要认证）
+- `GET /api/siteinfo` - 获取站点信息（需要认证）
 
 ## Recommended IDE Setup
 
@@ -114,17 +140,27 @@ npm run build
 所有API调用都封装在 `src/api/index.js` 中。示例：
 
 ```javascript
-import { getPosts, getPost, login } from '@/api/index.js'
+import { getTickets, getTicket, createTicket, login } from '@/api/index.js'
 
-// 获取文章列表
-const result = await getPosts({ page: 1, size: 10 })
+// 获取工单列表
+const result = await getTickets({ page: 1, size: 10 })
 
-// 获取文章详情
-const post = await getPost(postId)
+// 获取工单详情
+const ticket = await getTicket(ticketId)
+
+// 创建工单
+const newTicket = await createTicket({ title: 'Issue', description: 'Details' })
 
 // 用户登录
 const user = await login({ username: 'user', password: 'pass' })
 ```
+
+### 认证机制
+
+- 登录成功后，后端返回的 `data` 中包含 `token` 字段
+- Token自动存储在 `localStorage` 中的 `user` 对象里
+- 请求拦截器自动在请求头中添加 `Authorization: Bearer {token}`
+- 响应拦截器检测401状态码，自动清除token并跳转到登录页
 
 ### 错误处理
 
@@ -132,7 +168,7 @@ API模块已内置统一的错误处理。所有API调用应该包裹在 try-cat
 
 ```javascript
 try {
-  const res = await getPosts()
+  const res = await getTickets()
   // 处理成功响应
 } catch (error) {
   // 处理错误

@@ -32,12 +32,6 @@
         <span>快速回复</span>
       </el-menu-item>
       
-      <!-- 分类管理 -->
-      <el-menu-item index="/categories">
-        <el-icon><FolderOpened /></el-icon>
-        <span>分类管理</span>
-      </el-menu-item>
-      
       <!-- 数据统计 -->
       <el-menu-item index="/statistics">
         <el-icon><TrendCharts /></el-icon>
@@ -56,7 +50,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { DataLine, Tickets, ChatLineSquare, FolderOpened, TrendCharts, User } from '@element-plus/icons-vue'
+import { DataLine, Tickets, ChatLineSquare, TrendCharts, User } from '@element-plus/icons-vue'
 
 const route = useRoute()
 
