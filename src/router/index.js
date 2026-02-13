@@ -34,7 +34,33 @@ const routes = [
   { path: '/register', name: 'Register', component: Register }
 ]
 
-export default createRouter({
+const router = createRouter({
   history: createWebHistory(),
   routes,
 })
+
+// 全局路由守卫
+router.beforeEach((to, from, next) => {
+  // 检查用户是否已登录
+  const userStr = localStorage.getItem('user')
+  const isAuthenticated = !!userStr
+
+  // 公共路由列表
+  const publicRoutes = ['Login', 'Register']
+  const isPublicRoute = publicRoutes.includes(to.name)
+
+  // 如果用户未登录且访问的不是公共路由，则重定向到登录页
+  if (!isAuthenticated && !isPublicRoute) {
+    next({ name: 'Login' })
+  } 
+  // 如果用户已登录且访问登录或注册页，则重定向到仪表板
+  else if (isAuthenticated && isPublicRoute) {
+    next({ name: 'Dashboard' })
+  } 
+  // 其他情况允许访问
+  else {
+    next()
+  }
+})
+
+export default router
