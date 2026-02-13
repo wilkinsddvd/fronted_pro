@@ -22,15 +22,31 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { User, ArrowDown } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import { logout } from '@/api/index.js'
 
 const router = useRouter()
 const route = useRoute()
 
 const username = ref('Admin')
+
+// 从localStorage读取用户名
+onMounted(() => {
+  const userStr = localStorage.getItem('user')
+  if (userStr) {
+    try {
+      const userData = JSON.parse(userStr)
+      if (userData.username) {
+        username.value = userData.username
+      }
+    } catch (e) {
+      console.error('Failed to parse user data from localStorage')
+    }
+  }
+})
 
 /**
  * 根据当前路由计算页面标题
@@ -40,7 +56,6 @@ const title = computed(() => {
     '/dashboard': '数据概览',
     '/tickets': '工单管理',
     '/quick-reply': '快速回复',
-    '/categories': '分类管理',
     '/statistics': '数据统计',
     '/profile-settings': '个人设置'
   }
@@ -51,9 +66,14 @@ const title = computed(() => {
  * 处理下拉菜单命令
  * @param {string} command - 菜单命令
  */
-const handleCommand = (command) => {
+const handleCommand = async (command) => {
   if (command === 'logout') {
     // 退出登录
+    try {
+      await logout()
+    } catch (e) {
+      console.error('Logout API error:', e)
+    }
     localStorage.removeItem('user')
     ElMessage.success('退出成功')
     router.push('/login')

@@ -43,99 +43,18 @@ request.interceptors.response.use(
     return res
   },
   error => {
+    // 如果是401未授权，清除本地用户信息，跳转到登录页
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('user')
+      // 避免在登录页重复跳转
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login'
+      }
+    }
     console.error('Network Error:', error.message)
     return Promise.reject(error)
   }
 )
-
-// ==================== 文章相关API ====================
-
-/**
- * 获取文章列表
- * @param {Object} params - 查询参数
- * @param {number} params.page - 页码，默认1
- * @param {number} params.size - 每页数量，默认10
- * @param {string} params.search - 搜索关键词
- * @param {string} params.category - 分类筛选
- * @param {string} params.tag - 标签筛选
- * @param {string} params.date - 日期筛选
- */
-export const getPosts = (params = {}) => {
-  return request({
-    url: '/posts',
-    method: 'get',
-    params
-  })
-}
-
-/**
- * 获取文章详情
- * @param {number} id - 文章ID
- */
-export const getPost = (id) => {
-  return request({
-    url: `/posts/${id}`,
-    method: 'get'
-  })
-}
-
-/**
- * 增加文章浏览量
- * @param {number} id - 文章ID
- */
-export const addPostView = (id) => {
-  return request({
-    url: `/posts/${id}/view`,
-    method: 'post'
-  })
-}
-
-/**
- * 点赞文章
- * @param {number} id - 文章ID
- */
-export const addPostLike = (id) => {
-  return request({
-    url: `/posts/${id}/like`,
-    method: 'post'
-  })
-}
-
-// ==================== 分类相关API ====================
-
-/**
- * 获取分类列表
- */
-export const getCategories = () => {
-  return request({
-    url: '/categories',
-    method: 'get'
-  })
-}
-
-// ==================== 标签相关API ====================
-
-/**
- * 获取标签列表
- */
-export const getTags = () => {
-  return request({
-    url: '/tags',
-    method: 'get'
-  })
-}
-
-// ==================== 归档相关API ====================
-
-/**
- * 获取归档列表
- */
-export const getArchive = () => {
-  return request({
-    url: '/archive',
-    method: 'get'
-  })
-}
 
 // ==================== 菜单相关API ====================
 
@@ -412,44 +331,6 @@ export const updateQuickReply = (id, data) => {
 export const deleteQuickReply = (id) => {
   return request({
     url: `/quick-replies/${id}`,
-    method: 'delete'
-  })
-}
-
-// ==================== 分类管理相关API ====================
-
-/**
- * 创建分类
- * @param {Object} data - 分类数据
- */
-export const createCategory = (data) => {
-  return request({
-    url: '/categories',
-    method: 'post',
-    data
-  })
-}
-
-/**
- * 更新分类
- * @param {number} id - 分类ID
- * @param {Object} data - 更新数据
- */
-export const updateCategory = (id, data) => {
-  return request({
-    url: `/categories/${id}`,
-    method: 'put',
-    data
-  })
-}
-
-/**
- * 删除分类
- * @param {number} id - 分类ID
- */
-export const deleteCategory = (id) => {
-  return request({
-    url: `/categories/${id}`,
     method: 'delete'
   })
 }
