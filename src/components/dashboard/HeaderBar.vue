@@ -7,7 +7,8 @@
       <el-dropdown @command="handleCommand">
         <div class="user-info">
           <el-icon><User /></el-icon>
-          <span class="username">{{ username }}</span>
+          <span class="username">{{ userStore.username }}</span>
+          <el-tag v-if="userStore.isAdmin" type="danger" size="small" style="margin: 0 4px;">管理员</el-tag>
           <el-icon class="el-icon--right"><ArrowDown /></el-icon>
         </div>
         <template #dropdown>
@@ -22,31 +23,15 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { User, ArrowDown } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { logout } from '@/api/index.js'
+import { userStore } from '@/store/user.js'
 
 const router = useRouter()
 const route = useRoute()
-
-const username = ref('Admin')
-
-// 从localStorage读取用户名
-onMounted(() => {
-  const userStr = localStorage.getItem('user')
-  if (userStr) {
-    try {
-      const userData = JSON.parse(userStr)
-      if (userData.username) {
-        username.value = userData.username
-      }
-    } catch (e) {
-      console.error('Failed to parse user data from localStorage')
-    }
-  }
-})
 
 /**
  * 根据当前路由计算页面标题
@@ -74,7 +59,7 @@ const handleCommand = async (command) => {
     } catch (e) {
       console.error('Logout API error:', e)
     }
-    localStorage.removeItem('user')
+    userStore.clear()
     ElMessage.success('退出成功')
     router.push('/login')
   } else if (command === 'profile') {

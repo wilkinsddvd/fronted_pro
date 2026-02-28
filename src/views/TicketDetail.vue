@@ -47,6 +47,34 @@
           </el-descriptions-item>
         </el-descriptions>
 
+        <!-- 状态变更历史时间线 -->
+        <div class="section" v-if="ticketHistory.length || historyLoading">
+          <h3>状态变更历史</h3>
+          <div v-loading="historyLoading">
+            <el-empty v-if="!historyLoading && ticketHistory.length === 0" description="暂无历史记录" />
+            <el-timeline v-else>
+              <el-timeline-item
+                v-for="(item, index) in ticketHistory"
+                :key="item.id || `${item.created_at}-${index}`"
+                :timestamp="item.created_at || item.createdAt"
+                placement="top"
+              >
+                <el-card>
+                  <p v-if="item.from_status || item.to_status">
+                    状态变更：
+                    <el-tag size="small">{{ item.from_status || item.fromStatus || '-' }}</el-tag>
+                    →
+                    <el-tag size="small" type="success">{{ item.to_status || item.toStatus }}</el-tag>
+                  </p>
+                  <p v-else-if="item.action"><strong>{{ item.action }}</strong></p>
+                  <p v-if="item.operator || item.changed_by">操作人：{{ item.operator || item.changed_by }}</p>
+                  <p v-if="item.comment || item.remark">备注：{{ item.comment || item.remark }}</p>
+                </el-card>
+              </el-timeline-item>
+            </el-timeline>
+          </div>
+        </div>
+
         <!-- 流程信息 -->
         <div class="section" v-if="ticket.workflow && ticket.workflow.length">
           <h3>流程记录</h3>
@@ -113,7 +141,7 @@ import { ElMessage } from 'element-plus'
 import { ArrowLeft } from '@element-plus/icons-vue'
 import TicketStatusTag from '@/components/ticket/TicketStatusTag.vue'
 import TicketForm from '@/components/ticket/TicketForm.vue'
-import { getTicket, updateTicket } from '@/api/index.js'
+import { getTicket, updateTicket, getTicketHistory } from '@/api/index.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -122,6 +150,8 @@ const ticket = ref(null)
 const loading = ref(false)
 const error = ref('')
 const formVisible = ref(false)
+const ticketHistory = ref([])
+const historyLoading = ref(false)
 
 const ticketId = computed(() => route.params.id)
 
@@ -152,6 +182,21 @@ const fetchTicket = async () => {
   }
 }
 
+const fetchTicketHistory = async () => {
+  historyLoading.value = true
+  try {
+    const res = await getTicketHistory(ticketId.value)
+    if (res && res.data) {
+      ticketHistory.value = Array.isArray(res.data) ? res.data : []
+    }
+  } catch (err) {
+    // 后端未提供历史记录接口时静默忽略
+    ticketHistory.value = []
+  } finally {
+    historyLoading.value = false
+  }
+}
+
 const handleBack = () => {
   router.back()
 }
@@ -173,6 +218,7 @@ const handleSubmit = async (data) => {
 
 onMounted(() => {
   fetchTicket()
+  fetchTicketHistory()
 })
 </script>
 
