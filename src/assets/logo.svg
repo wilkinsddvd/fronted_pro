@@ -1,1 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 261.76 226.69"><path d="M161.096.001l-30.225 52.351L100.647.001H-.005l130.877 226.688L261.749.001z" fill="#41b883"/><path d="M161.096.001l-30.225 52.351L100.647.001H52.346l78.526 136.01L209.398.001z" fill="#34495e"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4a90e2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#002FA7;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="shine" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.25" />
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0" />
+    </linearGradient>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="50" cy="50" r="48" fill="url(#bg)" />
+  <circle cx="50" cy="50" r="48" fill="url(#shine)" />
+  <!-- Main building body -->
+  <rect x="22" y="42" width="56" height="36" rx="2" fill="#ffffff" opacity="0.95"/>
+  <!-- Roof / triangle top -->
+  <polygon points="50,16 14,44 86,44" fill="#e8f0fe" opacity="0.9"/>
+  <!-- Door -->
+  <rect x="41" y="60" width="18" height="18" rx="2" fill="#002FA7" opacity="0.85"/>
+  <!-- Windows -->
+  <rect x="27" y="51" width="10" height="8" rx="1.5" fill="#002FA7" opacity="0.7"/>
+  <rect x="63" y="51" width="10" height="8" rx="1.5" fill="#002FA7" opacity="0.7"/>
+  <!-- Flag / pole on top -->
+  <line x1="50" y1="16" x2="50" y2="8" stroke="#ffffff" stroke-width="2"/>
+  <polygon points="50,8 60,12 50,16" fill="#FFD700" opacity="0.9"/>
+</svg>

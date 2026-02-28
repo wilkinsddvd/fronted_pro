@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { login } from '@/api/index.js'
 import { showMessage } from '@/utils/message.js'
+import logoUrl from '@/assets/logo.svg'
 
 const username = ref('')
 const password = ref('')
@@ -40,6 +41,13 @@ async function handleLogin() {
 
 <template>
   <div class="page-bg">
+    <div class="page-header">
+      <img :src="logoUrl" alt="后勤管理系统" class="page-header-logo" />
+      <div class="page-header-text">
+        <span class="page-header-title">后勤管理系统</span>
+        <span class="page-header-subtitle">Logistics Management</span>
+      </div>
+    </div>
     <transition name="fade-up">
       <div class="form-card">
         <div class="avatar-wrap">
