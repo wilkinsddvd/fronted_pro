@@ -39,17 +39,69 @@ async function handleLogin() {
 </script>
 
 <template>
-  <div class="form-container">
-    <h2>登录</h2>
-    <form @submit.prevent="handleLogin">
-      <input v-model="username" placeholder="用户名" required autofocus />
-      <input v-model="password" placeholder="密码" type="password" required />
-      <button type="submit" :disabled="loading">
-        {{ loading ? '登录中...' : '登录' }}
-      </button>
-      <p class="error" v-if="error">{{ error }}</p>
-      <p>还没有账号？<router-link to="/register">注册</router-link></p>
-    </form>
+  <div class="page-bg">
+    <transition name="fade-up">
+      <div class="form-card">
+        <div class="avatar-wrap">
+          <el-avatar :size="64" class="form-avatar">
+            <el-icon :size="36"><User /></el-icon>
+          </el-avatar>
+        </div>
+        <h2 class="form-title">欢迎回来</h2>
+        <p class="form-subtitle">登录您的账号</p>
+        <el-form @submit.prevent="handleLogin" class="el-form-wrap">
+          <el-form-item>
+            <el-input
+              v-model="username"
+              placeholder="用户名"
+              size="large"
+              clearable
+              autofocus
+            >
+              <template #prefix>
+                <el-icon><User /></el-icon>
+              </template>
+            </el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-input
+              v-model="password"
+              placeholder="密码"
+              type="password"
+              size="large"
+              show-password
+            >
+              <template #prefix>
+                <el-icon><Lock /></el-icon>
+              </template>
+            </el-input>
+          </el-form-item>
+          <el-alert
+            v-if="error"
+            :title="error"
+            type="error"
+            show-icon
+            :closable="false"
+            class="form-alert"
+          />
+          <el-form-item>
+            <el-button
+              type="primary"
+              size="large"
+              class="submit-btn"
+              :loading="loading"
+              native-type="submit"
+            >
+              {{ loading ? '登录中...' : '登录' }}
+            </el-button>
+          </el-form-item>
+        </el-form>
+        <p class="form-footer">
+          还没有账号？
+          <router-link to="/register" class="form-link">立即注册</router-link>
+        </p>
+      </div>
+    </transition>
   </div>
 </template>
 
