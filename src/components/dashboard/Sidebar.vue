@@ -32,8 +32,8 @@
         <span>快速回复</span>
       </el-menu-item>
       
-      <!-- 数据统计 -->
-      <el-menu-item index="/statistics">
+      <!-- 数据统计（仅管理员可见） -->
+      <el-menu-item v-if="userStore.isAdmin" index="/statistics">
         <el-icon><TrendCharts /></el-icon>
         <span>数据统计</span>
       </el-menu-item>
@@ -51,6 +51,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { DataLine, Tickets, ChatLineSquare, TrendCharts, User } from '@element-plus/icons-vue'
+import { userStore } from '@/store/user.js'
 
 const route = useRoute()
 
