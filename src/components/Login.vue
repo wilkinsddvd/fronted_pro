@@ -43,6 +43,13 @@ async function handleLogin() {
       payload.captcha = captcha.value
     }
     const res = await login(payload)
+    // 防御性检查：若响应中缺少token则中止，避免fetchSelf 401导致重定向循环
+    if (!res.data?.token) {
+      localStorage.removeItem('user')
+      error.value = '获取登录信息失败，请重新登录'
+      showMessage(error.value, 'error')
+      return
+    }
     // 先保存登录响应（含token），再拉取完整用户信息（含role）
     localStorage.setItem('user', JSON.stringify(res.data))
     const selfOk = await userStore.fetchSelf()
