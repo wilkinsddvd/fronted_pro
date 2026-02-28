@@ -45,7 +45,14 @@ async function handleLogin() {
     const res = await login(payload)
     // 先保存登录响应（含token），再拉取完整用户信息（含role）
     localStorage.setItem('user', JSON.stringify(res.data))
-    await userStore.fetchSelf()
+    const selfOk = await userStore.fetchSelf()
+    // 若fetchSelf失败（如token无效），清除登录态并提示
+    if (!selfOk) {
+      userStore.clear()
+      error.value = '获取用户信息失败，请重新登录'
+      showMessage(error.value, 'error')
+      return
+    }
     showMessage('登录成功！', 'success')
     setTimeout(() => {
       router.push('/dashboard')

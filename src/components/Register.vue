@@ -48,9 +48,22 @@ async function handleRegister() {
       payload.captcha = captcha.value
     }
     const res = await register(payload)
+    // 防御性检查：若响应中缺少token则中止，避免fetchSelf 401导致重定向循环
+    if (!res.data?.token) {
+      error.value = res.msg || '注册失败，请重试'
+      showMessage(error.value, 'error')
+      return
+    }
     // 先保存注册响应（含token），再拉取完整用户信息（含role）
     localStorage.setItem('user', JSON.stringify(res.data))
-    await userStore.fetchSelf()
+    const selfOk = await userStore.fetchSelf()
+    if (!selfOk) {
+      userStore.clear()
+      error.value = '用户信息加载失败，请重新登录'
+      showMessage(error.value, 'error')
+      router.push('/login')
+      return
+    }
     showMessage('注册成功！', 'success')
     setTimeout(() => {
       router.push('/dashboard')
