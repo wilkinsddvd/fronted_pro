@@ -50,7 +50,8 @@ async function handleRegister() {
     const res = await register(payload)
     // 防御性检查：若响应中缺少token则中止，避免fetchSelf 401导致重定向循环
     if (!res.data?.token) {
-      error.value = res.msg || '注册失败，请重试'
+      localStorage.removeItem('user')
+      error.value = '获取登陆信息失败，请重新登录'
       showMessage(error.value, 'error')
       return
     }

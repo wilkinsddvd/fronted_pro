@@ -45,10 +45,11 @@ request.interceptors.response.use(
   },
   error => {
     const status = error.response?.status
-    // 401/403：清除登录态并跳转到登录页
+    // 401/403：清除登录态并跳转到登录页（公共页面不跳转，避免循环）
     if (status === 401 || status === 403) {
       localStorage.removeItem('user')
-      if (window.location.pathname !== '/login') {
+      const public_paths = ['/login', '/register']
+      if (!public_paths.includes(window.location.pathname)) {
         window.location.href = '/login'
       }
     } else if (status >= 500) {
