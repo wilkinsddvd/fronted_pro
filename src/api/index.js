@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { ElMessage } from 'element-plus'
 
 // 创建axios实例
 const request = axios.create({
@@ -43,13 +44,16 @@ request.interceptors.response.use(
     return res
   },
   error => {
-    // 如果是401未授权，清除本地用户信息，跳转到登录页
-    if (error.response && error.response.status === 401) {
+    const status = error.response?.status
+    // 401/403：清除登录态并跳转到登录页
+    if (status === 401 || status === 403) {
       localStorage.removeItem('user')
-      // 避免在登录页重复跳转
       if (window.location.pathname !== '/login') {
         window.location.href = '/login'
       }
+    } else if (status >= 500) {
+      // 5xx：友好提示服务器错误
+      ElMessage.error('服务器错误，请稍后重试')
     }
     console.error('Network Error:', error.message)
     return Promise.reject(error)
@@ -71,7 +75,7 @@ export const getMenus = () => {
 // ==================== 站点信息相关API ====================
 
 /**
- * 获取站点信息
+ * 获取站点信息（含 captcha_enabled 等配置项）
  */
 export const getSiteInfo = () => {
   return request({
@@ -284,6 +288,17 @@ export const deleteTicket = (id) => {
   return request({
     url: `/tickets/${id}`,
     method: 'delete'
+  })
+}
+
+/**
+ * 获取工单状态变更历史（时间线）
+ * @param {number} id - 工单ID
+ */
+export const getTicketHistory = (id) => {
+  return request({
+    url: `/tickets/${id}/history`,
+    method: 'get'
   })
 }
 

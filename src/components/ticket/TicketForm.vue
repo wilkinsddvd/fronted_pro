@@ -51,7 +51,6 @@
       <el-form-item label="状态" prop="status" v-if="isEdit">
         <el-select v-model="formData.status" placeholder="请选择状态" style="width: 100%">
           <el-option label="新建" value="open" />
-          <el-option label="待处理" value="pending" />
           <el-option label="处理中" value="in_progress" />
           <el-option label="已解决" value="resolved" />
           <el-option label="已关闭" value="closed" />
@@ -107,6 +106,8 @@ const formData = ref({
   assignee: ''
 })
 
+const ALLOWED_STATUSES = ['open', 'in_progress', 'resolved', 'closed']
+
 const rules = {
   title: [
     { required: true, message: '请输入工单标题', trigger: 'blur' },
@@ -119,7 +120,29 @@ const rules = {
     { required: true, message: '请选择分类', trigger: 'change' }
   ],
   priority: [
-    { required: true, message: '请选择优先级', trigger: 'change' }
+    { required: true, message: '请选择优先级', trigger: 'change' },
+    {
+      validator: (rule, value, callback) => {
+        if (!['low', 'medium', 'high'].includes(value)) {
+          callback(new Error('优先级值无效'))
+        } else {
+          callback()
+        }
+      },
+      trigger: 'change'
+    }
+  ],
+  status: [
+    {
+      validator: (rule, value, callback) => {
+        if (value && !ALLOWED_STATUSES.includes(value)) {
+          callback(new Error('状态值无效'))
+        } else {
+          callback()
+        }
+      },
+      trigger: 'change'
+    }
   ]
 }
 

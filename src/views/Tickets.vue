@@ -35,7 +35,6 @@
             style="width: 100%"
           >
             <el-option label="新建" value="open" />
-            <el-option label="待处理" value="pending" />
             <el-option label="处理中" value="in_progress" />
             <el-option label="已解决" value="resolved" />
             <el-option label="已关闭" value="closed" />
