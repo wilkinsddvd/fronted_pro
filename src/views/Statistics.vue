@@ -48,7 +48,7 @@
             <span>工单状态分布</span>
           </template>
           <div v-loading="statusLoading" class="chart-container">
-            <div ref="statusChartRef" style="width: 100%; height: 100%;"></div>
+            <div ref="statusChartRef" style="width: 100%; height: 300px;"></div>
             <el-empty v-if="!statusLoading && statusData.length === 0" description="暂无数据" />
           </div>
         </el-card>
@@ -61,7 +61,7 @@
             <span>工单优先级分布</span>
           </template>
           <div v-loading="priorityLoading" class="chart-container">
-            <div ref="priorityChartRef" style="width: 100%; height: 100%;"></div>
+            <div ref="priorityChartRef" style="width: 100%; height: 300px;"></div>
             <el-empty v-if="!priorityLoading && priorityData.length === 0" description="暂无数据" />
           </div>
         </el-card>
@@ -76,7 +76,7 @@
             <span>用户处理工单统计</span>
           </template>
           <div v-loading="userStatsLoading" class="chart-container">
-            <div ref="userStatsChartRef" style="width: 100%; height: 100%;"></div>
+            <div ref="userStatsChartRef" style="width: 100%; height: 300px;"></div>
             <el-empty v-if="!userStatsLoading && userStatsData.length === 0" description="暂无数据" />
           </div>
         </el-card>
@@ -91,7 +91,7 @@
             <span>响应时间统计</span>
           </template>
           <div v-loading="responseTimeLoading" class="chart-container">
-            <div ref="responseTimeChartRef" style="width: 100%; height: 100%;"></div>
+            <div ref="responseTimeChartRef" style="width: 100%; height: 300px;"></div>
             <el-empty v-if="!responseTimeLoading && responseTimeData.length === 0" description="暂无数据" />
           </div>
         </el-card>
@@ -534,6 +534,10 @@ const refreshData = async () => {
       fetchUserHandlingStats(),
       fetchResponseTimeStats()
     ])
+
+    // 数据渲染完成后，等待 DOM 更新，再统一 resize 所有图表
+    await nextTick()
+    handleResize()
 
     const hasFailure = results.some(r => r.status === 'rejected')
     if (hasFailure) {
