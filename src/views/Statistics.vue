@@ -520,31 +520,44 @@ const handleDateChange = () => {
 const refreshData = async () => {
   refreshing.value = true
   error.value = ''
-  
+
   try {
-    await Promise.allSettled([
+    const results = await Promise.allSettled([
       fetchOverviewStats(),
       fetchStatusDistribution(),
       fetchPriorityDistribution(),
       fetchUserHandlingStats(),
       fetchResponseTimeStats()
     ])
-    ElMessage.success('数据刷新成功')
+
+    const hasFailure = results.some(r => r.status === 'rejected')
+    if (hasFailure) {
+      ElMessage.warning('部分数据加载失败，请稍后重试')
+    } else {
+      ElMessage.success('数据刷新成功')
+    }
   } finally {
     refreshing.value = false
   }
 }
 
+const handleResize = () => {
+  statusChart?.resize()
+  priorityChart?.resize()
+  userStatsChart?.resize()
+  responseTimeChart?.resize()
+}
+
 // Lifecycle hooks
 onMounted(async () => {
   await nextTick()
-  
+
   // Initialize all charts
   initStatusChart()
   initPriorityChart()
   initUserStatsChart()
   initResponseTimeChart()
-  
+
   // Resize charts after initialization to match containers
   setTimeout(() => {
     statusChart?.resize()
@@ -552,26 +565,16 @@ onMounted(async () => {
     userStatsChart?.resize()
     responseTimeChart?.resize()
   }, CHART_RESIZE_DELAY)
-  
+
   // Fetch initial data
   refreshData()
-  
+
   // Handle window resize
-  const handleResize = () => {
-    statusChart?.resize()
-    priorityChart?.resize()
-    userStatsChart?.resize()
-    responseTimeChart?.resize()
-  }
   window.addEventListener('resize', handleResize)
-  
-  // Cleanup
-  onUnmounted(() => {
-    window.removeEventListener('resize', handleResize)
-  })
 })
 
 onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
   statusChart?.dispose()
   priorityChart?.dispose()
   userStatsChart?.dispose()
