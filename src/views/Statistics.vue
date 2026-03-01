@@ -590,21 +590,17 @@ onUnmounted(() => {
 <style scoped>
 .statistics {
   animation: fadeIn 0.3s ease-in;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-height: 0;
+  padding-bottom: 20px;
+  overflow-y: auto;
 }
 
 .filter-card {
   margin-bottom: 20px;
   border-radius: 8px;
-  flex-shrink: 0;
 }
 
 .stats-overview {
   margin-bottom: 20px;
-  flex-shrink: 0;
 }
 
 .stat-card {
@@ -650,17 +646,9 @@ onUnmounted(() => {
 
 .chart-card {
   border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  margin-bottom: 0;
 }
 
 .chart-card :deep(.el-card__body) {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
   padding: 20px;
 }
 
@@ -675,51 +663,20 @@ onUnmounted(() => {
   height: 300px;
 }
 
-/* First row of charts (2 pie charts) - flex with equal distribution */
 .statistics .charts-row-pie {
-  flex: 1;
-  min-height: 0;
-  display: flex;
   margin-bottom: 20px;
 }
 
-.statistics .charts-row-pie .el-col {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
-/* Second row (user stats bar chart) - flex with larger portion */
 .statistics .charts-row-bar {
-  flex: 1.2;
-  min-height: 0;
-  display: flex;
   margin-bottom: 20px;
 }
 
-.statistics .charts-row-bar .el-col {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
-/* Third row (response time chart) - flex with larger portion */
 .statistics .charts-row-line {
-  flex: 1.2;
-  min-height: 0;
-  display: flex;
   margin-bottom: 0;
-}
-
-.statistics .charts-row-line .el-col {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
 }
 
 /* Error alert at the bottom */
 .statistics > :deep(.el-alert) {
-  flex-shrink: 0;
   margin-top: 20px;
 }
 
