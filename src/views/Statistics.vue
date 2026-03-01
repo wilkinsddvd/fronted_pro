@@ -419,6 +419,7 @@ const updateUserStatsChart = () => {
       {
         name: '新增工单',
         type: 'bar',
+        barMaxWidth: 60,
         data: newTickets,
         itemStyle: {
           color: '#409EFF'
@@ -427,6 +428,7 @@ const updateUserStatsChart = () => {
       {
         name: '完成工单',
         type: 'bar',
+        barMaxWidth: 60,
         data: completedTickets,
         itemStyle: {
           color: '#67C23A'
@@ -468,7 +470,7 @@ const updateResponseTimeChart = () => {
       left: '3%',
       right: '4%',
       bottom: '50px',
-      top: '20px',
+      top: '40px',
       containLabel: true
     },
     xAxis: {
@@ -478,7 +480,10 @@ const updateResponseTimeChart = () => {
     },
     yAxis: {
       type: 'value',
-      name: '小时'
+      name: '小时',
+      nameGap: 8,
+      min: 0,
+      minInterval: 1
     },
     series: [
       {
@@ -660,16 +665,14 @@ onUnmounted(() => {
 }
 
 .chart-container {
-  flex: 1;
   width: 100%;
-  min-height: 280px;
+  min-height: 300px;
   position: relative;
-  display: flex;
 }
 
 .chart-container > div {
-  flex: 1;
-  min-height: 0;
+  width: 100%;
+  height: 300px;
 }
 
 /* First row of charts (2 pie charts) - flex with equal distribution */
