@@ -15,7 +15,8 @@
     </el-table-column>
     <el-table-column prop="priority" label="优先级" width="100">
       <template #default="{ row }">
-        <el-tag v-if="row.priority === 'high'" type="danger" size="small">高</el-tag>
+        <el-tag v-if="row.priority === 'urgent'" type="danger" size="small">紧急</el-tag>
+        <el-tag v-else-if="row.priority === 'high'" type="danger" size="small">高</el-tag>
         <el-tag v-else-if="row.priority === 'medium'" type="warning" size="small">中</el-tag>
         <el-tag v-else type="info" size="small">低</el-tag>
       </template>

@@ -42,20 +42,30 @@
 
       <el-form-item label="优先级" prop="priority">
         <el-select v-model="formData.priority" placeholder="请选择优先级" style="width: 100%">
-          <el-option label="低" value="low" />
-          <el-option label="中" value="medium" />
+          <el-option label="紧急" value="urgent" />
           <el-option label="高" value="high" />
+          <el-option label="中" value="medium" />
+          <el-option label="低" value="low" />
         </el-select>
       </el-form-item>
 
       <el-form-item label="状态" prop="status" v-if="isEdit">
         <el-select v-model="formData.status" placeholder="请选择状态" style="width: 100%">
           <el-option label="新建" value="open" />
-          <el-option label="待处理" value="pending" />
           <el-option label="处理中" value="in_progress" />
           <el-option label="已解决" value="resolved" />
           <el-option label="已关闭" value="closed" />
         </el-select>
+      </el-form-item>
+
+      <el-form-item label="截止日期" prop="due_date">
+        <el-date-picker
+          v-model="formData.due_date"
+          type="date"
+          placeholder="请选择截止日期"
+          style="width: 100%"
+          value-format="YYYY-MM-DD"
+        />
       </el-form-item>
 
       <el-form-item label="处理人" prop="assignee" v-if="isEdit">
@@ -104,7 +114,8 @@ const formData = ref({
   category: '',
   priority: 'medium',
   status: 'open',
-  assignee: ''
+  assignee: '',
+  due_date: ''
 })
 
 const rules = {
@@ -134,7 +145,8 @@ watch(() => props.visible, (val) => {
         category: props.ticket.category || '',
         priority: props.ticket.priority || 'medium',
         status: props.ticket.status || 'open',
-        assignee: props.ticket.assignee || ''
+        assignee: props.ticket.assignee || '',
+        due_date: props.ticket.due_date || ''
       }
     } else {
       resetForm()
@@ -158,7 +170,8 @@ const resetForm = () => {
     category: '',
     priority: 'medium',
     status: 'open',
-    assignee: ''
+    assignee: '',
+    due_date: ''
   }
   formRef.value?.clearValidate()
 }

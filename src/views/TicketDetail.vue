@@ -23,7 +23,8 @@
             <TicketStatusTag :status="ticket.status" />
           </el-descriptions-item>
           <el-descriptions-item label="优先级">
-            <el-tag v-if="ticket.priority === 'high'" type="danger">高</el-tag>
+            <el-tag v-if="ticket.priority === 'urgent'" type="danger">紧急</el-tag>
+            <el-tag v-else-if="ticket.priority === 'high'" type="danger">高</el-tag>
             <el-tag v-else-if="ticket.priority === 'medium'" type="warning">中</el-tag>
             <el-tag v-else type="info">低</el-tag>
           </el-descriptions-item>
@@ -41,6 +42,9 @@
           </el-descriptions-item>
           <el-descriptions-item label="处理人">
             {{ ticket.assignee || '未分配' }}
+          </el-descriptions-item>
+          <el-descriptions-item label="截止日期">
+            {{ ticket.due_date || '未设置' }}
           </el-descriptions-item>
           <el-descriptions-item label="描述" :span="2">
             <div class="description">{{ ticket.description }}</div>
