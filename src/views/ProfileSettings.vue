@@ -48,12 +48,15 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getMockUserInfo, saveMockUserInfo } from '@/api/user'
+import { getMockUserInfo, saveMockUserInfo, changePassword } from '@/api/user'
 import BasicInfoForm from './profile-settings/BasicInfoForm.vue'
 import SecuritySettings from './profile-settings/SecuritySettings.vue'
 import PersonalizationSettings from './profile-settings/PersonalizationSettings.vue'
 import PrivacySettings from './profile-settings/PrivacySettings.vue'
+
+const router = useRouter()
 
 // ==================== 响应式数据 ====================
 const activeTab = ref('basic') // 当前激活的标签页
@@ -101,6 +104,18 @@ const loadUserInfo = async () => {
     // 实际项目中应使用: const res = await getUserInfo()
     const data = getMockUserInfo()
     userInfo.value = data
+    // 从localStorage读取登录时保存的用户名
+    const userStr = localStorage.getItem('user')
+    if (userStr) {
+      try {
+        const userData = JSON.parse(userStr)
+        if (userData.username) {
+          userInfo.value.username = userData.username
+        }
+      } catch (e) {
+        console.error('Failed to parse user data', e)
+      }
+    }
   } catch (error) {
     ElMessage.error('加载用户信息失败')
     console.error('Load user info error:', error)
@@ -164,15 +179,13 @@ const handleChangePassword = async (data) => {
 
     loading.value = true
     
-    // 模拟密码修改（实际项目中应调用真实API）
-    // await changePassword(data)
+    await changePassword(data)
     
     ElMessage.success('密码修改成功，请重新登录')
-    
-    // 实际项目中应跳转到登录页
-    // setTimeout(() => {
-    //   router.push('/login')
-    // }, 2000)
+    localStorage.removeItem('user')
+    setTimeout(() => {
+      router.push('/login')
+    }, 2000)
   } catch (error) {
     if (error !== 'cancel') {
       ElMessage.error('密码修改失败，请检查原密码是否正确')

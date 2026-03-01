@@ -17,8 +17,6 @@ request.interceptors.request.use(
         // 如果有token字段，使用token，否则可以传递用户ID等
         if (userData.token) {
           config.headers['Authorization'] = `Bearer ${userData.token}`
-        } else if (userData.id) {
-          config.headers['X-User-ID'] = userData.id
         }
       } catch (e) {
         console.error('Failed to parse user data from localStorage')
