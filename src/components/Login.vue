@@ -17,6 +17,14 @@ async function handleLogin() {
     error.value = '用户名和密码不能为空'
     return
   }
+  if (username.value.length < 3) {
+    error.value = '用户名至少 3 位'
+    return
+  }
+  if (password.value.length < 8) {
+    error.value = '密码至少 8 位'
+    return
+  }
   
   loading.value = true
   try {
@@ -66,6 +74,7 @@ async function handleLogin() {
               size="large"
               clearable
               autofocus
+              maxlength="32"
             >
               <template #prefix>
                 <el-icon><User /></el-icon>
@@ -79,6 +88,7 @@ async function handleLogin() {
               type="password"
               size="large"
               show-password
+              minlength="8"
             >
               <template #prefix>
                 <el-icon><Lock /></el-icon>
