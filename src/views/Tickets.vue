@@ -10,7 +10,7 @@
 
       <!-- 搜索和筛选 -->
       <el-row :gutter="20" style="margin-bottom: 20px">
-        <el-col :xs="24" :sm="12" :md="8">
+        <el-col :xs="24" :sm="12" :md="6">
           <el-input
             v-model="searchQuery"
             placeholder="搜索工单标题或ID"
@@ -26,7 +26,7 @@
             </template>
           </el-input>
         </el-col>
-        <el-col :xs="24" :sm="12" :md="8">
+        <el-col :xs="24" :sm="12" :md="6">
           <el-select
             v-model="statusFilter"
             placeholder="筛选状态"
@@ -40,7 +40,7 @@
             <el-option label="已关闭" value="closed" />
           </el-select>
         </el-col>
-        <el-col :xs="24" :sm="12" :md="8">
+        <el-col :xs="24" :sm="12" :md="6">
           <el-select
             v-model="priorityFilter"
             placeholder="筛选优先级"
@@ -52,6 +52,20 @@
             <el-option label="高" value="high" />
             <el-option label="中" value="medium" />
             <el-option label="低" value="low" />
+          </el-select>
+        </el-col>
+        <el-col :xs="24" :sm="12" :md="6">
+          <el-select
+            v-model="categoryFilter"
+            placeholder="筛选分类"
+            clearable
+            @change="handleSearch"
+            style="width: 100%"
+          >
+            <el-option label="技术支持" value="technical" />
+            <el-option label="售后服务" value="after_sales" />
+            <el-option label="产品咨询" value="product" />
+            <el-option label="其他" value="other" />
           </el-select>
         </el-col>
       </el-row>
@@ -118,6 +132,7 @@ const total = ref(0)
 const searchQuery = ref('')
 const statusFilter = ref('')
 const priorityFilter = ref('')
+const categoryFilter = ref('')
 const formVisible = ref(false)
 const currentTicket = ref(null)
 
@@ -140,6 +155,10 @@ const fetchTickets = async () => {
     
     if (priorityFilter.value) {
       params.priority = priorityFilter.value
+    }
+
+    if (categoryFilter.value) {
+      params.category = categoryFilter.value
     }
 
     const res = await getTickets(params)

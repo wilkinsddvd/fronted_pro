@@ -128,6 +128,16 @@ export const getSelf = () => {
   })
 }
 
+/**
+ * 获取用户列表（用于处理人下拉选择）
+ */
+export const getUsers = () => {
+  return request({
+    url: '/users',
+    method: 'get'
+  })
+}
+
 // ==================== 仪表盘相关API ====================
 
 /**
