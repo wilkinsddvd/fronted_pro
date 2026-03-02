@@ -50,6 +50,7 @@ async function handleLogin() {
     </div>
     <transition name="fade-up">
       <div class="form-card">
+        <div class="accent-bar"></div>
         <div class="avatar-wrap">
           <el-avatar :size="64" class="form-avatar">
             <el-icon :size="36"><User /></el-icon>
