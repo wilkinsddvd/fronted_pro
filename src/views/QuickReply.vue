@@ -116,7 +116,11 @@ const fetchReplies = async () => {
       params.category = categoryFilter.value
     }
 
-    const res = await getQuickReplies(params)
+    const res = await getQuickReplies({
+      ...params,
+      page: currentPage.value,
+      size: pageSize.value
+    })
     if (res && res.data) {
       // 优先从 quick_replies 字段获取数据
       const data = res.data.quick_replies || res.data.items || res.data.list || res.data || []

@@ -82,10 +82,25 @@
           </el-table>
         </div>
 
-        <!-- 回复区域（预留） -->
+        <!-- 回复区域 -->
         <div class="section">
           <h3>回复</h3>
-          <el-empty description="回复功能即将上线" />
+          <TicketReplyList
+            :replies="replies"
+            :loading="repliesLoading"
+            :current-username="currentUsername"
+            @delete="handleReplyDelete"
+          />
+          <div class="reply-form-wrap">
+            <h4>发表回复</h4>
+            <TicketReplyForm
+              ref="replyFormRef"
+              :ticket-id="Number(ticketId)"
+              :quick-replies="quickReplies"
+              :submitting="replySubmitting"
+              @submit="handleReplySubmit"
+            />
+          </div>
         </div>
       </div>
     </el-card>
@@ -113,11 +128,13 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { ArrowLeft } from '@element-plus/icons-vue'
 import TicketStatusTag from '@/components/ticket/TicketStatusTag.vue'
 import TicketForm from '@/components/ticket/TicketForm.vue'
-import { getTicket, updateTicket } from '@/api/index.js'
+import TicketReplyList from '@/components/ticket/TicketReplyList.vue'
+import TicketReplyForm from '@/components/ticket/TicketReplyForm.vue'
+import { getTicket, updateTicket, getTicketReplies, createTicketReply, deleteTicketReply, getQuickReplies } from '@/api/index.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -126,6 +143,13 @@ const ticket = ref(null)
 const loading = ref(false)
 const error = ref('')
 const formVisible = ref(false)
+
+const replies = ref([])
+const repliesLoading = ref(false)
+const replySubmitting = ref(false)
+const quickReplies = ref([])
+const replyFormRef = ref(null)
+const currentUsername = ref('')
 
 const ticketId = computed(() => route.params.id)
 
@@ -175,8 +199,80 @@ const handleSubmit = async (data) => {
   }
 }
 
+const loadCurrentUser = () => {
+  try {
+    const userStr = localStorage.getItem('user')
+    if (userStr) {
+      const user = JSON.parse(userStr)
+      currentUsername.value = user.username || ''
+    }
+  } catch (e) {
+    console.error('Failed to parse user data from localStorage:', e)
+  }
+}
+
+const fetchReplies = async () => {
+  repliesLoading.value = true
+  try {
+    const res = await getTicketReplies(ticketId.value)
+    if (res && res.data) {
+      replies.value = res.data.replies || []
+    }
+  } catch (err) {
+    console.error('获取回复失败:', err)
+  } finally {
+    repliesLoading.value = false
+  }
+}
+
+const fetchQuickReplies = async () => {
+  try {
+    const res = await getQuickReplies()
+    if (res && res.data) {
+      const data = res.data.quick_replies || res.data || []
+      quickReplies.value = Array.isArray(data) ? data : []
+    }
+  } catch (err) {
+    console.error('获取快速回复失败:', err)
+  }
+}
+
+const handleReplySubmit = async (data) => {
+  replySubmitting.value = true
+  try {
+    await createTicketReply(ticketId.value, data)
+    ElMessage.success('回复成功')
+    replyFormRef.value?.resetForm()
+    fetchReplies()
+  } catch (err) {
+    ElMessage.error('回复失败: ' + (err.message || '网络错误'))
+  } finally {
+    replySubmitting.value = false
+  }
+}
+
+const handleReplyDelete = async (reply) => {
+  try {
+    await ElMessageBox.confirm('确认删除该回复吗？', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+    await deleteTicketReply(ticketId.value, reply.id)
+    ElMessage.success('删除成功')
+    fetchReplies()
+  } catch (err) {
+    if (err !== 'cancel') {
+      ElMessage.error('删除失败: ' + (err.message || '网络错误'))
+    }
+  }
+}
+
 onMounted(() => {
   fetchTicket()
+  fetchReplies()
+  fetchQuickReplies()
+  loadCurrentUser()
 })
 </script>
 
@@ -221,6 +317,19 @@ onMounted(() => {
   margin-bottom: 16px;
   font-size: 16px;
   font-weight: 600;
+}
+
+.reply-form-wrap {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px dashed #e4e7ed;
+}
+
+.reply-form-wrap h4 {
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #606266;
 }
 
 @keyframes fadeIn {
