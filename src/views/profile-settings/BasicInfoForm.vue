@@ -110,6 +110,7 @@
 import { ref, reactive, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Upload, Message, Phone } from '@element-plus/icons-vue'
+import { uploadAvatar } from '@/api/user'
 
 // ==================== Props ====================
 const props = defineProps({
@@ -188,33 +189,41 @@ watch(() => props.userInfo, (newVal) => {
 // ==================== 方法 ====================
 /**
  * 处理头像文件变更
- * 实现本地预览功能
+ * 上传头像到后端，拿到 URL 后更新预览
  * @param {Object} file - 上传的文件对象
  */
-const handleAvatarChange = (file) => {
+const handleAvatarChange = async (file) => {
   const rawFile = file.raw
-  
+
   // 验证文件类型
-  const isImage = rawFile.type.startsWith('image/')
+  const isImage = ['image/jpeg', 'image/png'].includes(rawFile.type)
   if (!isImage) {
-    ElMessage.error('只能上传图片文件！')
+    ElMessage.error('只能上传 JPG 或 PNG 格式的图片！')
     return
   }
-  
+
   // 验证文件大小（2MB）
   const isLt2M = rawFile.size / 1024 / 1024 < 2
   if (!isLt2M) {
     ElMessage.error('图片大小不能超过 2MB！')
     return
   }
-  
-  // 本地预览：使用 FileReader 读取文件并转换为 base64
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    formData.avatar = e.target.result
-    ElMessage.success('头像已更新，请点击保存按钮')
+
+  // 立即上传到后端
+  try {
+    const uploadData = new FormData()
+    uploadData.append('file', rawFile)
+    const res = await uploadAvatar(uploadData)
+    if (res.code === 200) {
+      formData.avatar = res.data?.avatar_url
+      ElMessage.success('头像上传成功，请点击保存按钮确认')
+    } else {
+      ElMessage.error(res.msg || '头像上传失败')
+    }
+  } catch (error) {
+    ElMessage.error('头像上传失败，请重试')
+    console.error('Upload avatar error:', error)
   }
-  reader.readAsDataURL(rawFile)
 }
 
 /**
