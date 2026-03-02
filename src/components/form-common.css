@@ -4,9 +4,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: #f0ece8;
   background-image: url('https://picui.ogmua.cn/s1/2026/03/02/69a4da65576c1.webp');
-  background-size: cover;
+  background-size: contain;
   background-position: center;
+  background-repeat: no-repeat;
   padding: 1rem;
   position: relative;
   overflow: hidden;
@@ -243,5 +245,4 @@
 
   .page-header-title {
     font-size: 0.9rem;
-  }
-}
+  }}
