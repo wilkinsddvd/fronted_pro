@@ -34,6 +34,10 @@ async function handleRegister() {
     error.value = '密码长度至少 8 位'
     return
   }
+  if (password.value.length > 64) {
+    error.value = '密码长度不能超过 64 位'
+    return
+  }
   if (!/[A-Za-z]/.test(password.value) || !/\d/.test(password.value)) {
     error.value = '密码需同时包含字母和数字'
     return
@@ -102,6 +106,7 @@ async function handleRegister() {
               size="large"
               show-password
               minlength="8"
+              maxlength="64"
             >
               <template #prefix>
                 <el-icon><Lock /></el-icon>
@@ -116,6 +121,7 @@ async function handleRegister() {
               size="large"
               show-password
               minlength="8"
+              maxlength="64"
             >
               <template #prefix>
                 <el-icon><Lock /></el-icon>
