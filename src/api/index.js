@@ -295,15 +295,57 @@ export const deleteTicket = (id) => {
   })
 }
 
+// ==================== 工单回复相关API ====================
+
+/**
+ * 获取工单回复列表
+ * @param {number} ticketId - 工单ID
+ */
+export const getTicketReplies = (ticketId) => {
+  return request({
+    url: `/tickets/${ticketId}/replies`,
+    method: 'get'
+  })
+}
+
+/**
+ * 创建工单回复
+ * @param {number} ticketId - 工单ID
+ * @param {Object} data - 回复数据
+ * @param {string} data.content - 回复内容
+ * @param {number|null} data.quick_reply_id - 快速回复ID（可选）
+ */
+export const createTicketReply = (ticketId, data) => {
+  return request({
+    url: `/tickets/${ticketId}/replies`,
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 删除工单回复
+ * @param {number} ticketId - 工单ID
+ * @param {number} replyId - 回复ID
+ */
+export const deleteTicketReply = (ticketId, replyId) => {
+  return request({
+    url: `/tickets/${ticketId}/replies/${replyId}`,
+    method: 'delete'
+  })
+}
+
 // ==================== 快速回复相关API ====================
 
 /**
  * 获取快速回复列表
+ * @param {Object} params - 查询参数
  */
-export const getQuickReplies = () => {
+export const getQuickReplies = (params = {}) => {
   return request({
     url: '/quick-replies',
-    method: 'get'
+    method: 'get',
+    params
   })
 }
 
