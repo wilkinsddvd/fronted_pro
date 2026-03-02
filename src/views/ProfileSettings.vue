@@ -33,15 +33,6 @@
           @update="handleUpdatePreferences"
         />
       </el-tab-pane>
-
-      <!-- 隐私设置标签页 -->
-      <el-tab-pane label="隐私设置" name="privacy">
-        <PrivacySettings 
-          :privacy="userInfo.privacy"
-          :loading="loading"
-          @update="handleUpdatePrivacy"
-        />
-      </el-tab-pane>
     </el-tabs>
   </div>
 </template>
@@ -50,11 +41,10 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getUserInfo, updateUserInfo, changePassword, updateUserPreferences, updatePrivacySettings } from '@/api/user'
+import { getUserInfo, updateUserInfo, changePassword, updateUserPreferences } from '@/api/user'
 import BasicInfoForm from './profile-settings/BasicInfoForm.vue'
 import SecuritySettings from './profile-settings/SecuritySettings.vue'
 import PersonalizationSettings from './profile-settings/PersonalizationSettings.vue'
-import PrivacySettings from './profile-settings/PrivacySettings.vue'
 
 const router = useRouter()
 
@@ -74,14 +64,7 @@ const userInfo = ref({
     theme: 'light',
     language: 'zh-CN',
     emailNotification: true,
-    smsNotification: false,
     systemNotification: true
-  },
-  privacy: {
-    profilePublic: true,
-    showEmail: false,
-    showPhone: false,
-    allowSearch: true
   }
 })
 
@@ -205,28 +188,6 @@ const handleUpdatePreferences = async (data) => {
   } catch (error) {
     ElMessage.error('保存失败，请重试')
     console.error('Update preferences error:', error)
-  } finally {
-    loading.value = false
-  }
-}
-
-/**
- * 处理隐私设置更新
- * @param {Object} data - 隐私设置数据
- */
-const handleUpdatePrivacy = async (data) => {
-  loading.value = true
-  try {
-    const res = await updatePrivacySettings(data)
-    if (res.code === 200) {
-      userInfo.value.privacy = { ...userInfo.value.privacy, ...data }
-      ElMessage.success('隐私设置已保存')
-    } else {
-      ElMessage.error(res.msg || '保存失败')
-    }
-  } catch (error) {
-    ElMessage.error('保存失败，请重试')
-    console.error('Update privacy error:', error)
   } finally {
     loading.value = false
   }
