@@ -7,7 +7,12 @@
     @row-click="handleRowClick"
   >
     <el-table-column prop="id" label="ID" width="80" />
-    <el-table-column prop="title" label="标题" min-width="200" show-overflow-tooltip />
+    <el-table-column prop="title" label="标题" min-width="200" show-overflow-tooltip>
+      <template #default="{ row }">
+        <span>{{ row.title }}</span>
+        <el-tag v-if="row.is_overdue" type="danger" size="small" style="margin-left: 6px">逾期</el-tag>
+      </template>
+    </el-table-column>
     <el-table-column prop="status" label="状态" width="120">
       <template #default="{ row }">
         <TicketStatusTag :status="row.status" />
@@ -23,7 +28,7 @@
     </el-table-column>
     <el-table-column prop="category" label="分类" width="120" />
     <el-table-column prop="assignee" label="处理人" width="120" />
-    <el-table-column prop="createdAt" label="创建时间" width="180" />
+    <el-table-column prop="created_at" label="创建时间" width="180" />
     <el-table-column label="操作" width="240" fixed="right">
       <template #default="{ row }">
         <el-button size="small" @click.stop="handleView(row)">查看</el-button>

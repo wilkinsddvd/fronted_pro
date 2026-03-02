@@ -68,11 +68,20 @@
         />
       </el-form-item>
 
-      <el-form-item label="处理人" prop="assignee" v-if="isEdit">
-        <el-input
-          v-model="formData.assignee"
-          placeholder="请输入处理人"
-        />
+      <el-form-item label="处理人" prop="assignee_id">
+        <el-select
+          v-model="formData.assignee_id"
+          placeholder="请选择处理人（可选）"
+          clearable
+          style="width: 100%"
+        >
+          <el-option
+            v-for="user in userList"
+            :key="user.id"
+            :label="user.username"
+            :value="user.id"
+          />
+        </el-select>
       </el-form-item>
     </el-form>
 
@@ -88,7 +97,8 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
+import { getUsers } from '@/api/index.js'
 
 const props = defineProps({
   visible: {
@@ -107,6 +117,18 @@ const formRef = ref(null)
 const dialogVisible = ref(false)
 const submitting = ref(false)
 const isEdit = ref(false)
+const userList = ref([])
+
+onMounted(async () => {
+  try {
+    const res = await getUsers()
+    if (res && res.data && res.data.users) {
+      userList.value = res.data.users
+    }
+  } catch (e) {
+    console.error('获取用户列表失败', e)
+  }
+})
 
 const formData = ref({
   title: '',
@@ -114,7 +136,7 @@ const formData = ref({
   category: '',
   priority: 'medium',
   status: 'open',
-  assignee: '',
+  assignee_id: null,
   due_date: ''
 })
 
@@ -145,7 +167,7 @@ watch(() => props.visible, (val) => {
         category: props.ticket.category || '',
         priority: props.ticket.priority || 'medium',
         status: props.ticket.status || 'open',
-        assignee: props.ticket.assignee || '',
+        assignee_id: props.ticket.assignee_id || null,
         due_date: props.ticket.due_date || ''
       }
     } else {
@@ -170,7 +192,7 @@ const resetForm = () => {
     category: '',
     priority: 'medium',
     status: 'open',
-    assignee: '',
+    assignee_id: null,
     due_date: ''
   }
   formRef.value?.clearValidate()

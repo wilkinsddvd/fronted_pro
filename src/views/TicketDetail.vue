@@ -32,13 +32,13 @@
             {{ getCategoryLabel(ticket.category) }}
           </el-descriptions-item>
           <el-descriptions-item label="创建时间">
-            {{ ticket.createdAt }}
+            {{ ticket.created_at }}
           </el-descriptions-item>
           <el-descriptions-item label="更新时间">
-            {{ ticket.updatedAt }}
+            {{ ticket.updated_at }}
           </el-descriptions-item>
           <el-descriptions-item label="创建人">
-            {{ ticket.creator || '未知' }}
+            {{ ticket.user || '未知' }}
           </el-descriptions-item>
           <el-descriptions-item label="处理人">
             {{ ticket.assignee || '未分配' }}
