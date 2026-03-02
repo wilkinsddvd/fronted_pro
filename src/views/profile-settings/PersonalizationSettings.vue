@@ -33,7 +33,7 @@
             跟随系统
           </el-radio>
         </el-radio-group>
-        <div class="form-tip">选择您喜欢的界面主题</div>
+        <div class="form-tip">选择您喜欢的界面主题，保存后立即生效</div>
       </el-form-item>
 
       <!-- 语言设置 -->
@@ -57,7 +57,12 @@
             <span style="float: right; color: #8492a6; font-size: 13px">en-US</span>
           </el-option>
         </el-select>
-        <div class="form-tip">选择界面显示语言</div>
+        <div class="form-tip">
+          选择界面显示语言，保存后需刷新页面生效
+          <el-tag v-if="languageChanged" type="warning" size="small" style="margin-left: 8px">
+            刷新后生效
+          </el-tag>
+        </div>
       </el-form-item>
 
       <!-- 通知设置 -->
@@ -72,16 +77,10 @@
           active-text="开启"
           inactive-text="关闭"
         />
-        <div class="form-tip">接收重要事件的邮件通知</div>
-      </el-form-item>
-
-      <el-form-item label="短信通知">
-        <el-switch 
-          v-model="formData.smsNotification"
-          active-text="开启"
-          inactive-text="关闭"
-        />
-        <div class="form-tip">接收重要事件的短信通知</div>
+        <div class="form-tip">
+          接收工单更新、状态变更等重要事件的邮件通知
+          <el-tag type="info" size="small" style="margin-left: 8px">配置已保存，邮件服务接入中</el-tag>
+        </div>
       </el-form-item>
 
       <el-form-item label="系统通知">
@@ -114,9 +113,12 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch, computed } from 'vue'
+import { ref, reactive, watch, computed, inject } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Picture, Sunny, Moon, Monitor, Reading, Bell } from '@element-plus/icons-vue'
+
+// 从 App.vue 注入的主题切换函数
+const applyTheme = inject('applyTheme', null)
 
 // ==================== Props ====================
 const props = defineProps({
@@ -137,13 +139,13 @@ const emit = defineEmits(['update'])
 // ==================== 响应式数据 ====================
 const formRef = ref(null)
 const saveLoading = ref(false)
+const languageChanged = ref(false)
 
-// 表单数据
+// 表单数据（移除 smsNotification）
 const formData = reactive({
   theme: 'light',
   language: 'zh-CN',
   emailNotification: true,
-  smsNotification: false,
   systemNotification: true
 })
 
@@ -153,19 +155,17 @@ const originalData = ref({})
 // ==================== 计算属性 ====================
 
 /**
- * 检查表单数据是否有变更
- * 用于控制保存按钮的禁用状态
+ * 检查表单数据是否有变更（移除 smsNotification 比较）
  */
 const hasChanges = computed(() => {
   if (!originalData.value || Object.keys(originalData.value).length === 0) {
     return false
   }
-  
+
   return (
     formData.theme !== originalData.value.theme ||
     formData.language !== originalData.value.language ||
     formData.emailNotification !== originalData.value.emailNotification ||
-    formData.smsNotification !== originalData.value.smsNotification ||
     formData.systemNotification !== originalData.value.systemNotification
   )
 })
@@ -174,17 +174,26 @@ const hasChanges = computed(() => {
 watch(() => props.preferences, (newVal) => {
   if (newVal) {
     const data = {
-      theme: newVal.theme || 'light',
-      language: newVal.language || 'zh-CN',
+      theme: newVal.theme || localStorage.getItem('app_theme') || 'light',
+      language: newVal.language || localStorage.getItem('app_language') || 'zh-CN',
       emailNotification: newVal.emailNotification !== undefined ? newVal.emailNotification : true,
-      smsNotification: newVal.smsNotification !== undefined ? newVal.smsNotification : false,
       systemNotification: newVal.systemNotification !== undefined ? newVal.systemNotification : true
     }
     Object.assign(formData, data)
     // 保存原始数据快照
     originalData.value = { ...data }
+    languageChanged.value = false
   }
 }, { immediate: true, deep: true })
+
+// 监听语言变化，显示"刷新后生效"提示
+watch(() => formData.language, (newVal) => {
+  if (originalData.value.language && newVal !== originalData.value.language) {
+    languageChanged.value = true
+  } else {
+    languageChanged.value = false
+  }
+})
 
 // ==================== 方法 ====================
 
@@ -193,25 +202,46 @@ watch(() => props.preferences, (newVal) => {
  */
 const handleSave = async () => {
   saveLoading.value = true
-  
+
   try {
-    // 准备提交数据
     const submitData = {
       theme: formData.theme,
       language: formData.language,
       emailNotification: formData.emailNotification,
-      smsNotification: formData.smsNotification,
       systemNotification: formData.systemNotification
     }
-    
-    // 触发父组件更新事件
+
+    // 记录语言是否变化（在更新快照前判断）
+    const langChanged = submitData.language !== originalData.value.language
+
+    // 立即应用主题
+    localStorage.setItem('app_theme', formData.theme)
+    if (applyTheme) {
+      applyTheme(formData.theme)
+    }
+
+    // 持久化语言设置（刷新后生效）
+    localStorage.setItem('app_language', formData.language)
+
+    // 触发父组件更新事件（保存到后端）
     emit('update', submitData)
-    
+
     // 更新原始数据快照
     originalData.value = { ...submitData }
-    
-    // 父组件会控制全局loading，这里立即关闭本地loading
+    languageChanged.value = false
+
     saveLoading.value = false
+
+    // 如果语言有变化，提示刷新
+    if (langChanged) {
+      ElMessage({
+        message: '设置已保存，语言将在刷新页面后生效',
+        type: 'success',
+        duration: 3000
+      })
+    } else {
+      ElMessage.success('设置已保存')
+    }
   } catch (error) {
     console.error('Save preferences error:', error)
     ElMessage.error('保存失败，请重试')
@@ -228,9 +258,9 @@ const handleReset = () => {
       theme: props.preferences.theme || 'light',
       language: props.preferences.language || 'zh-CN',
       emailNotification: props.preferences.emailNotification !== undefined ? props.preferences.emailNotification : true,
-      smsNotification: props.preferences.smsNotification !== undefined ? props.preferences.smsNotification : false,
       systemNotification: props.preferences.systemNotification !== undefined ? props.preferences.systemNotification : true
     })
+    languageChanged.value = false
   }
   ElMessage.info('已重置为当前保存的设置')
 }
@@ -271,6 +301,10 @@ const handleReset = () => {
   font-size: 12px;
   color: #909399;
   line-height: 1.5;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
 }
 
 .personalization-form :deep(.el-form-item__content) {

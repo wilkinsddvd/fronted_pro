@@ -33,30 +33,17 @@
           @update="handleUpdatePreferences"
         />
       </el-tab-pane>
-
-      <!-- 隐私设置标签页 -->
-      <el-tab-pane label="隐私设置" name="privacy">
-        <PrivacySettings 
-          :privacy="userInfo.privacy"
-          :loading="loading"
-          @update="handleUpdatePrivacy"
-        />
-      </el-tab-pane>
     </el-tabs>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getUserInfo, updateUserInfo, changePassword, updateUserPreferences, updatePrivacySettings } from '@/api/user'
+import { getUserInfo, updateUserInfo, changePassword, updateUserPreferences } from '@/api/user'
 import BasicInfoForm from './profile-settings/BasicInfoForm.vue'
 import SecuritySettings from './profile-settings/SecuritySettings.vue'
 import PersonalizationSettings from './profile-settings/PersonalizationSettings.vue'
-import PrivacySettings from './profile-settings/PrivacySettings.vue'
-
-const router = useRouter()
 
 // ==================== 响应式数据 ====================
 const activeTab = ref('basic') // 当前激活的标签页
@@ -74,14 +61,7 @@ const userInfo = ref({
     theme: 'light',
     language: 'zh-CN',
     emailNotification: true,
-    smsNotification: false,
     systemNotification: true
-  },
-  privacy: {
-    profilePublic: true,
-    showEmail: false,
-    showPhone: false,
-    allowSearch: true
   }
 })
 
@@ -157,32 +137,17 @@ const handleUpdateBasicInfo = async (data) => {
  * @param {Object} data - 密码修改数据
  */
 const handleChangePassword = async (data) => {
-  // 重要操作前弹窗确认
   try {
-    await ElMessageBox.confirm(
-      '修改密码后需要重新登录，确定要继续吗？',
-      '修改密码确认',
-      {
-        confirmButtonText: '确定修改',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }
-    )
-
     loading.value = true
-    
-    await changePassword(data)
-    
-    ElMessage.success('密码修改成功，请重新登录')
-    localStorage.removeItem('user')
-    setTimeout(() => {
-      router.push('/login')
-    }, 2000)
-  } catch (error) {
-    if (error !== 'cancel') {
-      ElMessage.error('密码修改失败，请检查原密码是否正确')
-      console.error('Change password error:', error)
+    const res = await changePassword(data)
+    if (res.code === 200) {
+      ElMessage.success('密码修改成功')
+    } else {
+      ElMessage.error(res.msg || '密码修改失败')
     }
+  } catch (error) {
+    ElMessage.error('密码修改失败，请重试')
+    console.error('Change password error:', error)
   } finally {
     loading.value = false
   }
@@ -193,40 +158,20 @@ const handleChangePassword = async (data) => {
  * @param {Object} data - 个性化设置数据
  */
 const handleUpdatePreferences = async (data) => {
-  loading.value = true
   try {
+    loading.value = true
     const res = await updateUserPreferences(data)
     if (res.code === 200) {
-      userInfo.value.preferences = { ...userInfo.value.preferences, ...data }
-      ElMessage.success('个性化设置已保存')
+      if (userInfo.value.preferences) {
+        Object.assign(userInfo.value.preferences, data)
+      }
+      ElMessage.success('个性化设置保存成功')
     } else {
       ElMessage.error(res.msg || '保存失败')
     }
   } catch (error) {
     ElMessage.error('保存失败，请重试')
     console.error('Update preferences error:', error)
-  } finally {
-    loading.value = false
-  }
-}
-
-/**
- * 处理隐私设置更新
- * @param {Object} data - 隐私设置数据
- */
-const handleUpdatePrivacy = async (data) => {
-  loading.value = true
-  try {
-    const res = await updatePrivacySettings(data)
-    if (res.code === 200) {
-      userInfo.value.privacy = { ...userInfo.value.privacy, ...data }
-      ElMessage.success('隐私设置已保存')
-    } else {
-      ElMessage.error(res.msg || '保存失败')
-    }
-  } catch (error) {
-    ElMessage.error('保存失败，请重试')
-    console.error('Update privacy error:', error)
   } finally {
     loading.value = false
   }
