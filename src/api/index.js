@@ -385,4 +385,71 @@ export const deleteQuickReply = (id) => {
   })
 }
 
+// ==================== 后勤人员管理相关API ====================
+
+/**
+ * 获取后勤人员列表（不分页，用于工单处理人下拉框）
+ */
+export const getStaffList = () => {
+  return request({
+    url: '/staff/list',
+    method: 'get'
+  })
+}
+
+/**
+ * 获取后勤人员列表（分页+搜索，用于管理页）
+ * @param {Object} params - 查询参数
+ * @param {number} params.page - 页码
+ * @param {number} params.size - 每页数量
+ * @param {string} params.search - 搜索关键词
+ */
+export const getStaff = (params = {}) => {
+  return request({
+    url: '/staff',
+    method: 'get',
+    params
+  })
+}
+
+/**
+ * 新增后勤人员
+ * @param {Object} data - 后勤人员数据
+ * @param {string} data.username - 用户名
+ * @param {string} data.password - 密码
+ * @param {string} data.nickname - 昵称（可选）
+ * @param {string} data.phone - 手机号（可选）
+ */
+export const createStaff = (data) => {
+  return request({
+    url: '/staff',
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 更新后勤人员信息
+ * @param {number} id - 后勤人员ID
+ * @param {Object} data - 更新数据
+ */
+export const updateStaff = (id, data) => {
+  return request({
+    url: `/staff/${id}`,
+    method: 'put',
+    data
+  })
+}
+
+/**
+ * 删除后勤人员（取消后勤权限）
+ * @param {number} id - 后勤人员ID
+ */
+export const deleteStaff = (id) => {
+  return request({
+    url: `/staff/${id}`,
+    method: 'delete'
+  })
+}
+
 export default request

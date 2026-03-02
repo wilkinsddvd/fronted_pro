@@ -78,7 +78,7 @@
           <el-option
             v-for="user in userList"
             :key="user.id"
-            :label="user.username"
+            :label="user.nickname ? `${user.nickname} (${user.username})` : user.username"
             :value="user.id"
           />
         </el-select>
@@ -98,7 +98,7 @@
 
 <script setup>
 import { ref, watch, onMounted } from 'vue'
-import { getUsers } from '@/api/index.js'
+import { getStaffList } from '@/api/index.js'
 
 const props = defineProps({
   visible: {
@@ -121,9 +121,9 @@ const userList = ref([])
 
 onMounted(async () => {
   try {
-    const res = await getUsers()
-    if (res && res.data && res.data.users) {
-      userList.value = res.data.users
+    const res = await getStaffList()
+    if (res && res.data && res.data.staff) {
+      userList.value = res.data.staff
     }
   } catch (e) {
     console.error('获取用户列表失败', e)

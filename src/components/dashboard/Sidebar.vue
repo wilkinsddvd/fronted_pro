@@ -38,6 +38,12 @@
         <span>数据统计</span>
       </el-menu-item>
       
+      <!-- 后勤人员管理 -->
+      <el-menu-item index="/staff-management">
+        <el-icon><Avatar /></el-icon>
+        <span>后勤人员</span>
+      </el-menu-item>
+
       <!-- 个人设置 -->
       <el-menu-item index="/profile-settings">
         <el-icon><User /></el-icon>
@@ -50,7 +56,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { DataLine, Tickets, ChatLineSquare, TrendCharts, User } from '@element-plus/icons-vue'
+import { DataLine, Tickets, ChatLineSquare, TrendCharts, User, Avatar } from '@element-plus/icons-vue'
 
 const route = useRoute()
 

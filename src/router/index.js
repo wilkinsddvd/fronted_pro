@@ -6,6 +6,7 @@ import TicketDetail from '../views/TicketDetail.vue'
 import QuickReply from '../views/QuickReply.vue'
 import Statistics from '../views/Statistics.vue'
 import ProfileSettings from '../views/ProfileSettings.vue'
+import StaffManagement from '../views/StaffManagement.vue'
 import Login from '../components/Login.vue'
 import Register from '../components/Register.vue'
 
@@ -25,7 +26,8 @@ const routes = [
       { path: '/quick-reply', name: 'QuickReply', component: QuickReply },
       { path: '/statistics', name: 'Statistics', component: Statistics },
       // 个人设置页面路由
-      { path: '/profile-settings', name: 'ProfileSettings', component: ProfileSettings }
+      { path: '/profile-settings', name: 'ProfileSettings', component: ProfileSettings },
+      { path: '/staff-management', name: 'StaffManagement', component: StaffManagement }
     ]
   },
   { path: '/login', name: 'Login', component: Login },
