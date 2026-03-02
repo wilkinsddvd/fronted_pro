@@ -18,8 +18,24 @@ async function handleRegister() {
     error.value = '用户名和密码不能为空'
     return
   }
+  if (username.value.length < 3 || username.value.length > 32) {
+    error.value = '用户名长度应在 3-32 字符之间'
+    return
+  }
+  if (!/^[A-Za-z0-9_]+$/.test(username.value)) {
+    error.value = '用户名只允许字母、数字和下划线'
+    return
+  }
   if (password.value !== repassword.value) {
     error.value = '两次密码输入不一致'
+    return
+  }
+  if (password.value.length < 8) {
+    error.value = '密码长度至少 8 位'
+    return
+  }
+  if (!/[A-Za-z]/.test(password.value) || !/\d/.test(password.value)) {
+    error.value = '密码需同时包含字母和数字'
     return
   }
   
@@ -71,6 +87,7 @@ async function handleRegister() {
               size="large"
               clearable
               autofocus
+              maxlength="32"
             >
               <template #prefix>
                 <el-icon><User /></el-icon>
@@ -84,6 +101,7 @@ async function handleRegister() {
               type="password"
               size="large"
               show-password
+              minlength="8"
             >
               <template #prefix>
                 <el-icon><Lock /></el-icon>
@@ -97,6 +115,7 @@ async function handleRegister() {
               type="password"
               size="large"
               show-password
+              minlength="8"
             >
               <template #prefix>
                 <el-icon><Lock /></el-icon>

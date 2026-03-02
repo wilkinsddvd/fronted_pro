@@ -37,11 +37,37 @@ const router = createRouter({
   routes,
 })
 
+/**
+ * 校验 localStorage 中存储的 Token 是否合法且未过期
+ */
+function isTokenValid() {
+  const userStr = localStorage.getItem('user')
+  if (!userStr) return false
+  let user
+  try {
+    user = JSON.parse(userStr)
+  } catch {
+    return false
+  }
+  if (!user || !user.token) return false
+  try {
+    const parts = user.token.split('.')
+    if (parts.length !== 3) return false
+    const payload = JSON.parse(atob(parts[1]))
+    if (payload.exp * 1000 <= Date.now()) {
+      localStorage.removeItem('user')
+      return false
+    }
+  } catch {
+    return false
+  }
+  return true
+}
+
 // 全局路由守卫
 router.beforeEach((to, from, next) => {
-  // 检查用户是否已登录
-  const userStr = localStorage.getItem('user')
-  const isAuthenticated = !!userStr
+  // 检查用户是否已登录且 Token 有效
+  const isAuthenticated = isTokenValid()
 
   // 公共路由列表
   const publicRoutes = ['Login', 'Register']
