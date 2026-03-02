@@ -50,7 +50,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getMockUserInfo, saveMockUserInfo, changePassword } from '@/api/user'
+import { getUserInfo, updateUserInfo, changePassword, updateUserPreferences, updatePrivacySettings } from '@/api/user'
 import BasicInfoForm from './profile-settings/BasicInfoForm.vue'
 import SecuritySettings from './profile-settings/SecuritySettings.vue'
 import PersonalizationSettings from './profile-settings/PersonalizationSettings.vue'
@@ -96,28 +96,18 @@ onMounted(async () => {
 // ==================== 方法 ====================
 /**
  * 加载用户信息
- * 使用模拟数据，实际项目中应调用真实API
  */
 const loadUserInfo = async () => {
   loading.value = true
   try {
-    // 实际项目中应使用: const res = await getUserInfo()
-    const data = getMockUserInfo()
-    userInfo.value = data
-    // 从localStorage读取登录时保存的用户名
-    const userStr = localStorage.getItem('user')
-    if (userStr) {
-      try {
-        const userData = JSON.parse(userStr)
-        if (userData.username) {
-          userInfo.value.username = userData.username
-        }
-      } catch (e) {
-        console.error('Failed to parse user data', e)
-      }
+    const res = await getUserInfo()
+    if (res.code === 200) {
+      userInfo.value = res.data
+    } else {
+      ElMessage.error(res.msg || '加载用户信息失败')
     }
   } catch (error) {
-    ElMessage.error('加载用户信息失败')
+    ElMessage.error('加载用户信息失败，请检查网络')
     console.error('Load user info error:', error)
   } finally {
     loading.value = false
@@ -143,13 +133,15 @@ const handleUpdateBasicInfo = async (data) => {
 
     loading.value = true
     
-    // 实际项目中应使用: await updateUserInfo(data)
-    const result = await saveMockUserInfo(data)
-    
-    // 更新本地数据
-    Object.assign(userInfo.value, data)
-    
-    ElMessage.success('基本信息更新成功')
+    const res = await updateUserInfo(data)
+    if (res.code === 200) {
+      if (res.data) {
+        Object.assign(userInfo.value, res.data)
+      }
+      ElMessage.success('基本信息更新成功')
+    } else {
+      ElMessage.error(res.msg || '更新失败')
+    }
   } catch (error) {
     if (error !== 'cancel') {
       ElMessage.error('更新失败，请重试')
@@ -203,15 +195,13 @@ const handleChangePassword = async (data) => {
 const handleUpdatePreferences = async (data) => {
   loading.value = true
   try {
-    // 实际项目中应使用: await updateUserPreferences(data)
-    const updatedUserInfo = { ...userInfo.value }
-    updatedUserInfo.preferences = { ...updatedUserInfo.preferences, ...data }
-    await saveMockUserInfo(updatedUserInfo)
-    
-    // 更新本地数据
-    userInfo.value.preferences = { ...userInfo.value.preferences, ...data }
-    
-    ElMessage.success('个性化设置已保存')
+    const res = await updateUserPreferences(data)
+    if (res.code === 200) {
+      userInfo.value.preferences = { ...userInfo.value.preferences, ...data }
+      ElMessage.success('个性化设置已保存')
+    } else {
+      ElMessage.error(res.msg || '保存失败')
+    }
   } catch (error) {
     ElMessage.error('保存失败，请重试')
     console.error('Update preferences error:', error)
@@ -227,15 +217,13 @@ const handleUpdatePreferences = async (data) => {
 const handleUpdatePrivacy = async (data) => {
   loading.value = true
   try {
-    // 实际项目中应使用: await updatePrivacySettings(data)
-    const updatedUserInfo = { ...userInfo.value }
-    updatedUserInfo.privacy = { ...updatedUserInfo.privacy, ...data }
-    await saveMockUserInfo(updatedUserInfo)
-    
-    // 更新本地数据
-    userInfo.value.privacy = { ...userInfo.value.privacy, ...data }
-    
-    ElMessage.success('隐私设置已保存')
+    const res = await updatePrivacySettings(data)
+    if (res.code === 200) {
+      userInfo.value.privacy = { ...userInfo.value.privacy, ...data }
+      ElMessage.success('隐私设置已保存')
+    } else {
+      ElMessage.error(res.msg || '保存失败')
+    }
   } catch (error) {
     ElMessage.error('保存失败，请重试')
     console.error('Update privacy error:', error)
