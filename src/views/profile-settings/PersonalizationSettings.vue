@@ -2,7 +2,7 @@
   <el-card class="personalization-card" shadow="hover">
     <template #header>
       <div class="card-header">
-        <span>个性化设置</span>
+        <span>{{ $t('personalization.cardTitle') }}</span>
       </div>
     </template>
 
@@ -15,37 +15,37 @@
       <!-- 主题设置 -->
       <el-divider content-position="left">
         <el-icon><Picture /></el-icon>
-        界面主题
+        {{ $t('personalization.themeSection') }}
       </el-divider>
 
-      <el-form-item label="主题模式">
+      <el-form-item :label="$t('personalization.themeMode')">
         <el-radio-group v-model="formData.theme">
           <el-radio label="light">
             <el-icon><Sunny /></el-icon>
-            浅色模式
+            {{ $t('personalization.themeLight') }}
           </el-radio>
           <el-radio label="dark">
             <el-icon><Moon /></el-icon>
-            深色模式
+            {{ $t('personalization.themeDark') }}
           </el-radio>
           <el-radio label="auto">
             <el-icon><Monitor /></el-icon>
-            跟随系统
+            {{ $t('personalization.themeAuto') }}
           </el-radio>
         </el-radio-group>
-        <div class="form-tip">选择您喜欢的界面主题，保存后立即生效</div>
+        <div class="form-tip">{{ $t('personalization.themeTip') }}</div>
       </el-form-item>
 
       <!-- 语言设置 -->
       <el-divider content-position="left">
         <el-icon><Reading /></el-icon>
-        语言偏好
+        {{ $t('personalization.languageSection') }}
       </el-divider>
 
-      <el-form-item label="显示语言">
+      <el-form-item :label="$t('personalization.displayLanguage')">
         <el-select 
           v-model="formData.language" 
-          placeholder="请选择语言"
+          :placeholder="$t('personalization.languagePlaceholder')"
           style="width: 200px"
         >
           <el-option label="简体中文" value="zh-CN">
@@ -57,46 +57,41 @@
             <span style="float: right; color: #8492a6; font-size: 13px">en-US</span>
           </el-option>
         </el-select>
-        <div class="form-tip">
-          选择界面显示语言，保存后需刷新页面生效
-          <el-tag v-if="languageChanged" type="warning" size="small" style="margin-left: 8px">
-            刷新后生效
-          </el-tag>
-        </div>
+        <div class="form-tip">{{ $t('personalization.languageTip') }}</div>
       </el-form-item>
 
       <!-- 通知设置 -->
       <el-divider content-position="left">
         <el-icon><Bell /></el-icon>
-        通知设置
+        {{ $t('personalization.notificationSection') }}
       </el-divider>
 
-      <el-form-item label="邮件通知">
+      <el-form-item :label="$t('personalization.emailNotification')">
         <el-switch 
           v-model="formData.emailNotification"
-          active-text="开启"
-          inactive-text="关闭"
+          :active-text="$t('personalization.on')"
+          :inactive-text="$t('personalization.off')"
         />
         <div class="form-tip">
-          接收工单更新、状态变更等重要事件的邮件通知
-          <el-tag type="info" size="small" style="margin-left: 8px">邮件服务接入中</el-tag>
+          {{ $t('personalization.emailTip') }}
+          <el-tag type="info" size="small" style="margin-left: 8px">{{ $t('personalization.emailPending') }}</el-tag>
         </div>
       </el-form-item>
 
-      <el-form-item label="系统通知">
+      <el-form-item :label="$t('personalization.systemNotification')">
         <el-switch 
           v-model="formData.systemNotification"
-          active-text="开启"
-          inactive-text="关闭"
+          :active-text="$t('personalization.on')"
+          :inactive-text="$t('personalization.off')"
         />
-        <div class="form-tip">在系统内显示通知消息（登录后可见）</div>
+        <div class="form-tip">{{ $t('personalization.systemTip') }}</div>
       </el-form-item>
 
       <!-- 操作按钮区域 - 底部右对齐 -->
       <el-form-item class="form-actions">
         <div class="actions-wrapper">
           <el-button @click="handleReset">
-            重置
+            {{ $t('personalization.reset') }}
           </el-button>
           <el-button 
             type="primary"
@@ -104,7 +99,7 @@
             :disabled="!hasChanges"
             @click="handleSave"
           >
-            保存设置
+            {{ $t('personalization.save') }}
           </el-button>
         </div>
       </el-form-item>
@@ -114,11 +109,14 @@
 
 <script setup>
 import { ref, reactive, watch, computed, inject } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { Picture, Sunny, Moon, Monitor, Reading, Bell } from '@element-plus/icons-vue'
 
 // 从 App.vue 注入的主题切换函数（若未注入则降级为 null）
 const applyTheme = inject('applyTheme', null)
+
+const { t, locale } = useI18n()
 
 // ==================== Props ====================
 const props = defineProps({
@@ -139,7 +137,6 @@ const emit = defineEmits(['update'])
 // ==================== 响应式数据 ====================
 const formRef = ref(null)
 const saveLoading = ref(false)
-const languageChanged = ref(false)
 
 // 表单数据（已移除 smsNotification）
 const formData = reactive({
@@ -183,18 +180,8 @@ watch(() => props.preferences, (newVal) => {
     Object.assign(formData, data)
     // 保存原始数据快照
     originalData.value = { ...data }
-    languageChanged.value = false
   }
 }, { immediate: true, deep: true })
-
-// 监听语言变化，显示"刷新后生效"提示
-watch(() => formData.language, (newVal) => {
-  if (Object.keys(originalData.value).length > 0 && newVal !== originalData.value.language) {
-    languageChanged.value = true
-  } else {
-    languageChanged.value = false
-  }
-})
 
 // ==================== 方法 ====================
 
@@ -212,39 +199,27 @@ const handleSave = async () => {
       systemNotification: formData.systemNotification
     }
 
-    // 记录语言是否有变化（在更新快照之前）
-    const langChanged = submitData.language !== originalData.value.language
-
     // 立即应用主题
     localStorage.setItem('app_theme', submitData.theme)
     if (applyTheme) {
       applyTheme(submitData.theme)
     }
 
-    // 持久化语言设置（刷新后生效）
+    // 立即切换语言
     localStorage.setItem('app_language', submitData.language)
+    locale.value = submitData.language
 
     // 触发父组件更新事件（保存到后端）
     emit('update', submitData)
     
     // 更新原始数据快照
     originalData.value = { ...submitData }
-    languageChanged.value = false
     saveLoading.value = false
 
-    // 根据是否有语言变化给出不同提示
-    if (langChanged) {
-      ElMessage({
-        message: '设置已保存，语言将在刷新页面后生效',
-        type: 'success',
-        duration: 3000
-      })
-    } else {
-      ElMessage.success('设置已保存')
-    }
+    ElMessage.success(t('personalization.saveSuccess'))
   } catch (error) {
     console.error('Save preferences error:', error)
-    ElMessage.error('保存失败，请重试')
+    ElMessage.error(t('personalization.saveError'))
     saveLoading.value = false
   }
 }
@@ -260,9 +235,8 @@ const handleReset = () => {
       emailNotification: props.preferences.emailNotification !== undefined ? props.preferences.emailNotification : true,
       systemNotification: props.preferences.systemNotification !== undefined ? props.preferences.systemNotification : true
     })
-    languageChanged.value = false
   }
-  ElMessage.info('已重置为当前保存的设置')
+  ElMessage.info(t('personalization.resetSuccess'))
 }
 </script>
 

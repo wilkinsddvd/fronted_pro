@@ -56,4 +56,9 @@ import HeaderBar from './HeaderBar.vue'
     padding: 84px 12px 12px 12px;
   }
 }
+
+/* Dark mode */
+:global(html.dark) .dashboard-layout {
+  background-color: #13141a;
+}
 </style>

@@ -12,8 +12,8 @@
         </div>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item command="profile">个人中心</el-dropdown-item>
-            <el-dropdown-item command="logout" divided>退出登录</el-dropdown-item>
+            <el-dropdown-item command="profile">{{ $t('header.profileCenter') }}</el-dropdown-item>
+            <el-dropdown-item command="logout" divided>{{ $t('header.logout') }}</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -24,12 +24,14 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { User, ArrowDown } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { logout } from '@/api/index.js'
 
 const router = useRouter()
 const route = useRoute()
+const { t } = useI18n()
 
 const username = ref('Admin')
 
@@ -53,13 +55,13 @@ onMounted(() => {
  */
 const title = computed(() => {
   const titles = {
-    '/dashboard': '数据概览',
-    '/tickets': '工单管理',
-    '/quick-reply': '快速回复',
-    '/statistics': '数据统计',
-    '/profile-settings': '个人设置'
+    '/dashboard': t('header.dashboard'),
+    '/tickets': t('header.tickets'),
+    '/quick-reply': t('header.quickReply'),
+    '/statistics': t('header.statistics'),
+    '/profile-settings': t('header.profileSettings')
   }
-  return titles[route.path] || '工单管理系统'
+  return titles[route.path] || t('header.defaultTitle')
 })
 
 /**
@@ -75,7 +77,7 @@ const handleCommand = async (command) => {
       console.error('Logout API error:', e)
     }
     localStorage.removeItem('user')
-    ElMessage.success('退出成功')
+    ElMessage.success(t('header.logoutSuccess'))
     router.push('/login')
   } else if (command === 'profile') {
     // 跳转到个人设置页面
@@ -146,5 +148,23 @@ const handleCommand = async (command) => {
   .username {
     display: none;
   }
+}
+
+/* Dark mode */
+:global(html.dark) .header-bar {
+  background-color: #1e1e2e;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+:global(html.dark) .header-left h3 {
+  color: #cfd3dc;
+}
+
+:global(html.dark) .username {
+  color: #a8b2c1;
+}
+
+:global(html.dark) .user-info:hover {
+  background-color: #2a2d3a;
 }
 </style>
