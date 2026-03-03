@@ -29,11 +29,10 @@
     <el-table-column prop="category" label="分类" width="120" />
     <el-table-column prop="assignee" label="处理人" width="120" />
     <el-table-column prop="created_at" label="创建时间" width="180" />
-    <el-table-column label="操作" width="240" fixed="right">
+    <el-table-column label="操作" width="150" fixed="right">
       <template #default="{ row }">
         <el-button size="small" @click.stop="handleView(row)">查看</el-button>
         <el-button size="small" type="primary" @click.stop="handleEdit(row)">编辑</el-button>
-        <el-button size="small" type="danger" @click.stop="handleDelete(row)">删除</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -53,7 +52,7 @@ defineProps({
   }
 })
 
-const emit = defineEmits(['view', 'edit', 'delete', 'row-click'])
+const emit = defineEmits(['view', 'edit', 'row-click'])
 
 const handleView = (row) => {
   emit('view', row)
@@ -61,10 +60,6 @@ const handleView = (row) => {
 
 const handleEdit = (row) => {
   emit('edit', row)
-}
-
-const handleDelete = (row) => {
-  emit('delete', row)
 }
 
 const handleRowClick = (row) => {

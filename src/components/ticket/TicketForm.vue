@@ -1,96 +1,108 @@
 <template>
   <el-dialog
     v-model="dialogVisible"
-    :title="isEdit ? '编辑工单' : '新建工单'"
+    :title="isEdit ? '变更工单状态' : '新建工单'"
     width="600px"
     @close="handleClose"
   >
-    <el-form
-      ref="formRef"
-      :model="formData"
-      :rules="rules"
-      label-width="100px"
-    >
-      <el-form-item label="标题" prop="title">
-        <el-input
-          v-model="formData.title"
-          placeholder="请输入工单标题"
-          maxlength="100"
-          show-word-limit
-        />
-      </el-form-item>
+    <!-- 编辑模式：只展示只读信息 + 状态选择 -->
+    <template v-if="isEdit">
+      <el-descriptions :column="1" border style="margin-bottom: 20px">
+        <el-descriptions-item label="标题">{{ formData.title }}</el-descriptions-item>
+        <el-descriptions-item label="描述">{{ formData.description || '（无）' }}</el-descriptions-item>
+        <el-descriptions-item label="分类">{{ categoryLabel(formData.category) }}</el-descriptions-item>
+        <el-descriptions-item label="优先级">{{ priorityLabel(formData.priority) }}</el-descriptions-item>
+      </el-descriptions>
+      <el-form ref="formRef" :model="formData" label-width="100px">
+        <el-form-item label="状态" prop="status" :rules="[{ required: true, message: '请选择状态', trigger: 'change' }]">
+          <el-select v-model="formData.status" placeholder="请选择状态" style="width: 100%">
+            <el-option label="新建" value="open" />
+            <el-option label="处理中" value="in_progress" />
+            <el-option label="已解决" value="resolved" />
+            <el-option label="已关闭" value="closed" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+    </template>
 
-      <el-form-item label="描述" prop="description">
-        <el-input
-          v-model="formData.description"
-          type="textarea"
-          :rows="4"
-          placeholder="请输入工单描述"
-          maxlength="500"
-          show-word-limit
-        />
-      </el-form-item>
-
-      <el-form-item label="分类" prop="category">
-        <el-select v-model="formData.category" placeholder="请选择分类" style="width: 100%">
-          <el-option label="技术支持" value="technical" />
-          <el-option label="售后服务" value="after_sales" />
-          <el-option label="产品咨询" value="product" />
-          <el-option label="其他" value="other" />
-        </el-select>
-      </el-form-item>
-
-      <el-form-item label="优先级" prop="priority">
-        <el-select v-model="formData.priority" placeholder="请选择优先级" style="width: 100%">
-          <el-option label="紧急" value="urgent" />
-          <el-option label="高" value="high" />
-          <el-option label="中" value="medium" />
-          <el-option label="低" value="low" />
-        </el-select>
-      </el-form-item>
-
-      <el-form-item label="状态" prop="status" v-if="isEdit">
-        <el-select v-model="formData.status" placeholder="请选择状态" style="width: 100%">
-          <el-option label="新建" value="open" />
-          <el-option label="处理中" value="in_progress" />
-          <el-option label="已解决" value="resolved" />
-          <el-option label="已关闭" value="closed" />
-        </el-select>
-      </el-form-item>
-
-      <el-form-item label="截止日期" prop="due_date">
-        <el-date-picker
-          v-model="formData.due_date"
-          type="date"
-          placeholder="请选择截止日期"
-          style="width: 100%"
-          value-format="YYYY-MM-DD"
-        />
-      </el-form-item>
-
-      <el-form-item label="处理人" prop="assignee_id">
-        <el-select
-          v-model="formData.assignee_id"
-          placeholder="请选择处理人（可选）"
-          clearable
-          style="width: 100%"
-        >
-          <el-option
-            v-for="user in userList"
-            :key="user.id"
-            :label="user.nickname ? `${user.nickname} (${user.username})` : user.username"
-            :value="user.id"
+    <!-- 新建模式：完整表单，保持原有内容不变 -->
+    <template v-else>
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :rules="rules"
+        label-width="100px"
+      >
+        <el-form-item label="标题" prop="title">
+          <el-input
+            v-model="formData.title"
+            placeholder="请输入工单标题"
+            maxlength="100"
+            show-word-limit
           />
-        </el-select>
-      </el-form-item>
-    </el-form>
+        </el-form-item>
+
+        <el-form-item label="描述" prop="description">
+          <el-input
+            v-model="formData.description"
+            type="textarea"
+            :rows="4"
+            placeholder="请输入工单描述"
+            maxlength="500"
+            show-word-limit
+          />
+        </el-form-item>
+
+        <el-form-item label="分类" prop="category">
+          <el-select v-model="formData.category" placeholder="请选择分类" style="width: 100%">
+            <el-option label="技术支持" value="technical" />
+            <el-option label="售后服务" value="after_sales" />
+            <el-option label="产品咨询" value="product" />
+            <el-option label="其他" value="other" />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="优先级" prop="priority">
+          <el-select v-model="formData.priority" placeholder="请选择优先级" style="width: 100%">
+            <el-option label="紧急" value="urgent" />
+            <el-option label="高" value="high" />
+            <el-option label="中" value="medium" />
+            <el-option label="低" value="low" />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="截止日期" prop="due_date">
+          <el-date-picker
+            v-model="formData.due_date"
+            type="date"
+            placeholder="请选择截止日期"
+            style="width: 100%"
+            value-format="YYYY-MM-DD"
+          />
+        </el-form-item>
+
+        <el-form-item label="处理人" prop="assignee_id">
+          <el-select
+            v-model="formData.assignee_id"
+            placeholder="请选择处理人（可选）"
+            clearable
+            style="width: 100%"
+          >
+            <el-option
+              v-for="user in userList"
+              :key="user.id"
+              :label="user.nickname ? `${user.nickname} (${user.username})` : user.username"
+              :value="user.id"
+            />
+          </el-select>
+        </el-form-item>
+      </el-form>
+    </template>
 
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="handleClose">取消</el-button>
-        <el-button type="primary" @click="handleSubmit" :loading="submitting">
-          确定
-        </el-button>
+        <el-button type="primary" @click="handleSubmit" :loading="submitting">确定</el-button>
       </span>
     </template>
   </el-dialog>
@@ -166,9 +178,7 @@ watch(() => props.visible, (val) => {
         description: props.ticket.description || '',
         category: props.ticket.category || '',
         priority: props.ticket.priority || 'medium',
-        status: props.ticket.status || 'open',
-        assignee_id: props.ticket.assignee_id || null,
-        due_date: props.ticket.due_date || ''
+        status: props.ticket.status || 'open'
       }
     } else {
       resetForm()
@@ -199,18 +209,31 @@ const resetForm = () => {
 }
 
 const handleSubmit = async () => {
-  const valid = await formRef.value.validate().catch(() => false)
-  if (!valid) return
-
+  try {
+    await formRef.value.validate()
+  } catch {
+    return
+  }
   submitting.value = true
   try {
-    await emit('submit', {
-      id: props.ticket?.id,
-      ...formData.value
-    })
+    if (isEdit.value) {
+      emit('submit', { id: props.ticket.id, status: formData.value.status })
+    } else {
+      emit('submit', { ...formData.value })
+    }
     handleClose()
   } finally {
     submitting.value = false
   }
+}
+
+const categoryLabel = (val) => {
+  const map = { technical: '技术支持', after_sales: '售后服务', product: '产品咨询', other: '其他' }
+  return map[val] || val || '—'
+}
+
+const priorityLabel = (val) => {
+  const map = { urgent: '紧急', high: '高', medium: '中', low: '低' }
+  return map[val] || val || '—'
 }
 </script>

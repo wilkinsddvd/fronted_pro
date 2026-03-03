@@ -76,7 +76,6 @@
         :loading="loading"
         @view="handleView"
         @edit="handleEdit"
-        @delete="handleDelete"
       />
 
       <!-- 分页 -->
@@ -115,11 +114,11 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import TicketTable from '@/components/ticket/TicketTable.vue'
 import TicketForm from '@/components/ticket/TicketForm.vue'
-import { getTickets, createTicket, updateTicket, deleteTicket } from '@/api/index.js'
+import { getTickets, createTicket, updateTicket } from '@/api/index.js'
 
 const router = useRouter()
 
@@ -193,28 +192,10 @@ const handleEdit = (row) => {
   formVisible.value = true
 }
 
-const handleDelete = async (row) => {
-  try {
-    await ElMessageBox.confirm('确认删除该工单吗？', '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    })
-    
-    await deleteTicket(row.id)
-    ElMessage.success('删除成功')
-    fetchTickets()
-  } catch (err) {
-    if (err !== 'cancel') {
-      ElMessage.error('删除失败: ' + (err.message || '网络错误'))
-    }
-  }
-}
-
 const handleSubmit = async (data) => {
   try {
     if (data.id) {
-      await updateTicket(data.id, data)
+      await updateTicket(data.id, { status: data.status })
       ElMessage.success('更新成功')
     } else {
       await createTicket(data)
