@@ -285,14 +285,11 @@ export const updateTicket = (id, data) => {
 }
 
 /**
- * 删除工单
+ * 获取工单状态变更历史
  * @param {number} id - 工单ID
  */
-export const deleteTicket = (id) => {
-  return request({
-    url: `/tickets/${id}`,
-    method: 'delete'
-  })
+export function getTicketHistory(id) {
+  return request.get(`/tickets/${id}/history`)
 }
 
 // ==================== 工单回复相关API ====================

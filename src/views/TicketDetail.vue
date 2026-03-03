@@ -71,14 +71,21 @@
         </div>
 
         <!-- 历史记录 -->
-        <div class="section" v-if="ticket.history && ticket.history.length">
+        <div class="section" v-if="ticketHistory.length > 0">
           <h3>变更历史</h3>
-          <el-table :data="ticket.history" stripe style="width: 100%">
-            <el-table-column prop="field" label="字段" width="120" />
-            <el-table-column prop="oldValue" label="原值" min-width="150" />
-            <el-table-column prop="newValue" label="新值" min-width="150" />
+          <el-table :data="ticketHistory" stripe style="width: 100%" v-loading="historyLoading">
+            <el-table-column prop="old_status" label="原状态" width="120">
+              <template #default="{ row }">
+                <TicketStatusTag :status="row.old_status" />
+              </template>
+            </el-table-column>
+            <el-table-column prop="new_status" label="新状态" width="120">
+              <template #default="{ row }">
+                <TicketStatusTag :status="row.new_status" />
+              </template>
+            </el-table-column>
             <el-table-column prop="operator" label="操作人" width="120" />
-            <el-table-column prop="createdAt" label="时间" width="180" />
+            <el-table-column prop="changed_at" label="变更时间" width="140" />
           </el-table>
         </div>
 
@@ -134,7 +141,7 @@ import TicketStatusTag from '@/components/ticket/TicketStatusTag.vue'
 import TicketForm from '@/components/ticket/TicketForm.vue'
 import TicketReplyList from '@/components/ticket/TicketReplyList.vue'
 import TicketReplyForm from '@/components/ticket/TicketReplyForm.vue'
-import { getTicket, updateTicket, getTicketReplies, createTicketReply, deleteTicketReply, getQuickReplies } from '@/api/index.js'
+import { getTicket, updateTicket, getTicketReplies, createTicketReply, deleteTicketReply, getQuickReplies, getTicketHistory } from '@/api/index.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -143,6 +150,8 @@ const ticket = ref(null)
 const loading = ref(false)
 const error = ref('')
 const formVisible = ref(false)
+const ticketHistory = ref([])
+const historyLoading = ref(false)
 
 const replies = ref([])
 const repliesLoading = ref(false)
@@ -190,9 +199,10 @@ const handleEdit = () => {
 
 const handleSubmit = async (data) => {
   try {
-    await updateTicket(data.id, data)
-    ElMessage.success('更新成功')
+    await updateTicket(data.id, { status: data.status })
+    ElMessage.success('状态更新成功')
     fetchTicket()
+    fetchTicketHistory()
   } catch (err) {
     ElMessage.error('更新失败: ' + (err.message || '网络错误'))
     throw err
@@ -222,6 +232,20 @@ const fetchReplies = async () => {
     console.error('获取回复失败:', err)
   } finally {
     repliesLoading.value = false
+  }
+}
+
+const fetchTicketHistory = async () => {
+  historyLoading.value = true
+  try {
+    const res = await getTicketHistory(ticketId.value)
+    if (res && res.data) {
+      ticketHistory.value = Array.isArray(res.data) ? res.data : (res.data.history || [])
+    }
+  } catch (err) {
+    console.error('获取变更历史失败:', err)
+  } finally {
+    historyLoading.value = false
   }
 }
 
@@ -272,6 +296,7 @@ onMounted(() => {
   fetchTicket()
   fetchReplies()
   fetchQuickReplies()
+  fetchTicketHistory()
   loadCurrentUser()
 })
 </script>
