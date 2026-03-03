@@ -2,7 +2,7 @@
   <div class="sidebar">
     <!-- Logo 区域 -->
     <div class="logo-container">
-      <h2>工单管理系统</h2>
+      <h2>{{ $t('sidebar.systemName') }}</h2>
     </div>
     
     <!-- 侧边栏菜单 -->
@@ -17,37 +17,37 @@
       <!-- 数据概览 -->
       <el-menu-item index="/dashboard">
         <el-icon><DataLine /></el-icon>
-        <span>数据概览</span>
+        <span>{{ $t('sidebar.dashboard') }}</span>
       </el-menu-item>
       
       <!-- 工单管理 -->
       <el-menu-item index="/tickets">
         <el-icon><Tickets /></el-icon>
-        <span>工单管理</span>
+        <span>{{ $t('sidebar.tickets') }}</span>
       </el-menu-item>
       
       <!-- 快速回复 -->
       <el-menu-item index="/quick-reply">
         <el-icon><ChatLineSquare /></el-icon>
-        <span>快速回复</span>
+        <span>{{ $t('sidebar.quickReply') }}</span>
       </el-menu-item>
       
       <!-- 数据统计 -->
       <el-menu-item index="/statistics">
         <el-icon><TrendCharts /></el-icon>
-        <span>数据统计</span>
+        <span>{{ $t('sidebar.statistics') }}</span>
       </el-menu-item>
       
       <!-- 后勤人员管理 -->
       <el-menu-item index="/staff-management">
         <el-icon><Avatar /></el-icon>
-        <span>后勤人员</span>
+        <span>{{ $t('sidebar.staffManagement') }}</span>
       </el-menu-item>
 
       <!-- 个人设置 -->
       <el-menu-item index="/profile-settings">
         <el-icon><User /></el-icon>
-        <span>个人设置</span>
+        <span>{{ $t('sidebar.profileSettings') }}</span>
       </el-menu-item>
     </el-menu>
   </div>
@@ -116,5 +116,32 @@ const activeMenu = computed(() => route.path)
   .sidebar.mobile-open {
     transform: translateX(0);
   }
+}
+
+/* Dark mode */
+:global(html.dark) .sidebar {
+  background-color: #1a1d23;
+}
+
+:global(html.dark) .logo-container {
+  background-color: #141619;
+}
+
+:global(html.dark) .sidebar-menu {
+  background-color: #1a1d23 !important;
+}
+
+:global(html.dark) .sidebar-menu :deep(.el-menu-item) {
+  background-color: #1a1d23 !important;
+  color: #a8b2c1 !important;
+}
+
+:global(html.dark) .sidebar-menu :deep(.el-menu-item:hover) {
+  background-color: #252830 !important;
+}
+
+:global(html.dark) .sidebar-menu :deep(.el-menu-item.is-active) {
+  color: #409EFF !important;
+  background-color: #252830 !important;
 }
 </style>

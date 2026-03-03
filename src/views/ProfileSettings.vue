@@ -2,14 +2,14 @@
   <div class="profile-settings">
     <!-- 页面标题 -->
     <div class="page-header">
-      <h2>个人设置</h2>
-      <p class="subtitle">管理您的个人信息、安全设置和偏好配置</p>
+      <h2>{{ $t('profile.title') }}</h2>
+      <p class="subtitle">{{ $t('profile.subtitle') }}</p>
     </div>
 
     <!-- 标签页布局 -->
     <el-tabs v-model="activeTab" class="settings-tabs" type="border-card">
       <!-- 基本信息标签页 -->
-      <el-tab-pane label="基本信息" name="basic">
+      <el-tab-pane :label="$t('profile.tabs.basic')" name="basic">
         <BasicInfoForm 
           :user-info="userInfo" 
           :loading="loading"
@@ -18,7 +18,7 @@
       </el-tab-pane>
 
       <!-- 安全设置标签页 -->
-      <el-tab-pane label="安全设置" name="security">
+      <el-tab-pane :label="$t('profile.tabs.security')" name="security">
         <SecuritySettings 
           :loading="loading"
           @change-password="handleChangePassword"
@@ -26,7 +26,7 @@
       </el-tab-pane>
 
       <!-- 个性化设置标签页 -->
-      <el-tab-pane label="个性化设置" name="personalization">
+      <el-tab-pane :label="$t('profile.tabs.personalization')" name="personalization">
         <PersonalizationSettings 
           :preferences="userInfo.preferences"
           :loading="loading"
