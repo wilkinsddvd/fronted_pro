@@ -1,10 +1,22 @@
 import axios from 'axios'
+import { useLoadingStore } from '@/stores/loadingStore'
 
 // 创建axios实例
 const request = axios.create({
   baseURL: '/api',
   timeout: 10000,
 })
+
+// Threshold in ms before showing global loading indicator
+const LOADING_DELAY = 300
+
+function getLoadingStore() {
+  try {
+    return useLoadingStore()
+  } catch {
+    return null
+  }
+}
 
 // 请求拦截器
 request.interceptors.request.use(
@@ -22,6 +34,19 @@ request.interceptors.request.use(
         console.error('Failed to parse user data from localStorage')
       }
     }
+
+    // Show loading indicator after LOADING_DELAY ms for slow requests
+    const loadingStore = getLoadingStore()
+    if (loadingStore && config.showLoading !== false) {
+      const requestKey = `api_${Date.now()}_${Math.random()}`
+      config._loadingKey = requestKey
+      config._loadingStarted = false
+      config._loadingTimer = setTimeout(() => {
+        config._loadingStarted = true
+        loadingStore.startLoading(requestKey, '请求中...')
+      }, LOADING_DELAY)
+    }
+
     return config
   },
   error => {
@@ -29,9 +54,25 @@ request.interceptors.request.use(
   }
 )
 
+function clearRequestLoading(config) {
+  if (!config) return
+  if (config._loadingTimer) {
+    clearTimeout(config._loadingTimer)
+    config._loadingTimer = null
+  }
+  if (config._loadingKey && config._loadingStarted) {
+    const loadingStore = getLoadingStore()
+    if (loadingStore) {
+      loadingStore.stopLoading(config._loadingKey)
+    }
+  }
+}
+
 // 响应拦截器
 request.interceptors.response.use(
   response => {
+    clearRequestLoading(response.config)
+
     const res = response.data
     // 统一处理后端返回格式 {code, data, msg}
     if (res.code !== 200 && res.code !== 201) {
@@ -41,6 +82,8 @@ request.interceptors.response.use(
     return res
   },
   error => {
+    clearRequestLoading(error.config)
+
     // 如果是401未授权，清除本地用户信息，跳转到登录页
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('user')

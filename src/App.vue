@@ -1,15 +1,23 @@
 <template>
+  <ProgressBar />
+  <LoadingOverlay :visible="appLoading" text="应用加载中..." />
   <router-view />
 </template>
 
 <script setup>
-import { onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useThemeStore } from '@/stores/themeStore'
+import LoadingOverlay from '@/components/LoadingOverlay.vue'
+import ProgressBar from '@/components/ProgressBar.vue'
 
 const themeStore = useThemeStore()
+const appLoading = ref(true)
 
-onMounted(() => {
+onMounted(async () => {
   themeStore.initTheme()
+  // Show splash screen briefly on app startup, then hide
+  await new Promise(resolve => setTimeout(resolve, 600))
+  appLoading.value = false
 })
 
 onUnmounted(() => {
