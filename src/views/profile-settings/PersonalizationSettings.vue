@@ -183,9 +183,9 @@ watch(() => props.preferences, (newVal) => {
   }
 }, { immediate: true, deep: true })
 
-// 实时预览主题（选择即生效）
+// 实时预览主题（选择即生效，但不持久化到 localStorage）
 watch(() => formData.theme, (newTheme) => {
-  themeStore.applyTheme(newTheme)
+  themeStore.previewTheme(newTheme)
 })
 
 // ==================== 方法 ====================

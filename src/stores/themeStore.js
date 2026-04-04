@@ -55,6 +55,37 @@ export const useThemeStore = defineStore('theme', () => {
   }
 
   /**
+   * Preview theme visually without persisting to localStorage
+   * Used for real-time preview when selecting a theme option
+   * @param {string} theme - 'light' | 'dark' | 'auto'
+   */
+  const previewTheme = (theme) => {
+    const html = document.documentElement
+    const mq = window.matchMedia('(prefers-color-scheme: dark)')
+
+    if (mediaQueryListener) {
+      mq.removeEventListener('change', mediaQueryListener)
+      mediaQueryListener = null
+    }
+
+    if (theme === 'dark') {
+      html.classList.add('dark')
+      isDarkMode.value = true
+    } else if (theme === 'auto') {
+      const prefersDark = mq.matches
+      if (prefersDark) {
+        html.classList.add('dark')
+      } else {
+        html.classList.remove('dark')
+      }
+      isDarkMode.value = prefersDark
+    } else {
+      html.classList.remove('dark')
+      isDarkMode.value = false
+    }
+  }
+
+  /**
    * Toggle between light and dark modes
    */
   const toggleTheme = () => {
@@ -81,5 +112,5 @@ export const useThemeStore = defineStore('theme', () => {
     }
   }
 
-  return { isDarkMode, applyTheme, toggleTheme, initTheme, cleanup }
+  return { isDarkMode, applyTheme, previewTheme, toggleTheme, initTheme, cleanup }
 })
