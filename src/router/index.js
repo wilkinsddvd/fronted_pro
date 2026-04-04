@@ -9,6 +9,7 @@ import ProfileSettings from '../views/ProfileSettings.vue'
 import StaffManagement from '../views/StaffManagement.vue'
 import Login from '../components/Login.vue'
 import Register from '../components/Register.vue'
+import { useLoadingStore } from '../stores/loadingStore'
 
 /**
  * 路由配置
@@ -68,6 +69,10 @@ function isTokenValid() {
 
 // 全局路由守卫
 router.beforeEach((to, from, next) => {
+  // Show route loading progress bar
+  const loadingStore = useLoadingStore()
+  loadingStore.routeLoading = true
+
   // 检查用户是否已登录且 Token 有效
   const isAuthenticated = isTokenValid()
 
@@ -87,6 +92,12 @@ router.beforeEach((to, from, next) => {
   else {
     next()
   }
+})
+
+router.afterEach(() => {
+  // Hide route loading progress bar
+  const loadingStore = useLoadingStore()
+  loadingStore.routeLoading = false
 })
 
 export default router
