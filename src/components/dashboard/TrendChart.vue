@@ -40,6 +40,7 @@ const emit = defineEmits(['rangeChange'])
 const chartRef = ref(null)
 const timeRange = ref('week')
 let chartInstance = null
+let resizeObserver = null
 
 // Chart color configuration
 const CHART_COLORS = {
@@ -55,6 +56,7 @@ const CHART_COLORS = {
 
 const initChart = () => {
   if (!chartRef.value) return
+  if (chartInstance) return
   
   chartInstance = echarts.init(chartRef.value)
   updateChart()
@@ -126,26 +128,54 @@ const updateChart = () => {
   chartInstance.setOption(option)
 }
 
+const handleResize = () => {
+  chartInstance?.resize()
+}
+
 const handleRangeChange = () => {
   emit('rangeChange', timeRange.value)
 }
 
 onMounted(async () => {
   await nextTick()
-  initChart()
-  
-  // Resize chart after initialization to match container
+
+  const tryInit = () => {
+    if (chartRef.value && chartRef.value.clientWidth > 0 && chartRef.value.clientHeight > 0) {
+      initChart()
+    }
+  }
+
+  tryInit()
+
+  // Use ResizeObserver to initialize the chart as soon as the container gets dimensions
+  if (!chartInstance && chartRef.value) {
+    resizeObserver = new ResizeObserver(() => {
+      if (!chartInstance) {
+        tryInit()
+      } else {
+        chartInstance.resize()
+      }
+    })
+    resizeObserver.observe(chartRef.value)
+  }
+
+  // Fallback: also try after a short delay for containers that transition in
   setTimeout(() => {
-    chartInstance?.resize()
+    if (!chartInstance) {
+      tryInit()
+    } else {
+      chartInstance.resize()
+    }
   }, CHART_RESIZE_DELAY)
-  
-  window.addEventListener('resize', () => {
-    chartInstance?.resize()
-  })
+
+  window.addEventListener('resize', handleResize)
 })
 
 onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+  resizeObserver?.disconnect()
   chartInstance?.dispose()
+  chartInstance = null
 })
 
 watch(() => props.data, () => {
@@ -167,12 +197,12 @@ watch(() => props.data, () => {
 .chart-container {
   flex: 1;
   width: 100%;
-  min-height: 0;
+  min-height: 300px;
   display: flex;
 }
 
 .chart-container > div {
   flex: 1;
-  min-height: 0;
+  min-height: 300px;
 }
 </style>

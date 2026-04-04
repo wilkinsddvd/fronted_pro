@@ -45,7 +45,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, markRaw } from 'vue'
 import StatsCards from '@/components/dashboard/StatsCards.vue'
 import TrendChart from '@/components/dashboard/TrendChart.vue'
 import CategoryPie from '@/components/dashboard/CategoryPie.vue'
@@ -59,7 +59,7 @@ const statsData = ref([
     value: 0,
     trend: null,
     color: '#409EFF',
-    icon: DocumentAdd
+    icon: markRaw(DocumentAdd)
   },
   {
     key: 'total',
@@ -67,7 +67,7 @@ const statsData = ref([
     value: 0,
     trend: null,
     color: '#E6A23C',
-    icon: Tickets
+    icon: markRaw(Tickets)
   },
   {
     key: 'completed',
@@ -75,7 +75,7 @@ const statsData = ref([
     value: 0,
     trend: null,
     color: '#67C23A',
-    icon: SuccessFilled
+    icon: markRaw(SuccessFilled)
   },
   {
     key: 'overdue',
@@ -83,7 +83,7 @@ const statsData = ref([
     value: 0,
     trend: null,
     color: '#F56C6C',
-    icon: WarnTriangleFilled
+    icon: markRaw(WarnTriangleFilled)
   }
 ])
 
@@ -114,7 +114,7 @@ const fetchDashboardStats = async () => {
           value: data.newTickets ?? 0,
           trend: data.newTicketsTrend ?? null,
           color: '#409EFF',
-          icon: DocumentAdd
+          icon: markRaw(DocumentAdd)
         },
         {
           key: 'total',
@@ -123,7 +123,7 @@ const fetchDashboardStats = async () => {
           // 后端暂不提供总工单数的趋势数据
           trend: null,
           color: '#E6A23C',
-          icon: Tickets
+          icon: markRaw(Tickets)
         },
         {
           key: 'completed',
@@ -131,7 +131,7 @@ const fetchDashboardStats = async () => {
           value: data.completedTickets ?? 0,
           trend: data.completedTicketsTrend ?? null,
           color: '#67C23A',
-          icon: SuccessFilled
+          icon: markRaw(SuccessFilled)
         },
         {
           key: 'overdue',
@@ -139,7 +139,7 @@ const fetchDashboardStats = async () => {
           value: data.overdueTickets ?? 0,
           trend: data.overdueTicketsTrend ?? null,
           color: '#F56C6C',
-          icon: WarnTriangleFilled
+          icon: markRaw(WarnTriangleFilled)
         }
       ]
     }
