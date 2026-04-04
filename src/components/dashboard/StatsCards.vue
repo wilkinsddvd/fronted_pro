@@ -2,7 +2,7 @@
   <div class="stats-cards">
     <el-row :gutter="20">
       <el-col :xs="24" :sm="12" :md="6" v-for="stat in stats" :key="stat.key">
-        <el-card class="stat-card" shadow="hover">
+        <el-card class="stat-card" shadow="hover" v-loading="loading">
           <div class="stat-content">
             <div class="stat-icon" :style="{ backgroundColor: stat.color }">
               <el-icon :size="28"><component :is="stat.icon" /></el-icon>
@@ -12,7 +12,7 @@
               <div class="stat-value">{{ stat.value }}</div>
             </div>
           </div>
-          <div class="stat-footer">
+          <div v-if="stat.trend !== null" class="stat-footer">
             <span :class="stat.trend >= 0 ? 'trend-up' : 'trend-down'">
               {{ stat.trend >= 0 ? '↑' : '↓' }} {{ Math.abs(stat.trend) }}%
             </span>
@@ -29,6 +29,10 @@ defineProps({
   stats: {
     type: Array,
     default: () => []
+  },
+  loading: {
+    type: Boolean,
+    default: false
   }
 })
 </script>
