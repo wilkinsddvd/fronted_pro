@@ -1,7 +1,18 @@
 <template>
   <div class="dashboard">
+    <!-- 页面头部：刷新按钮 -->
+    <div class="dashboard-header">
+      <el-button
+        :loading="statsLoading || trendLoading || categoryLoading"
+        :icon="Refresh"
+        circle
+        @click="refreshData"
+        title="刷新数据"
+      />
+    </div>
+
     <!-- 统计卡片 -->
-    <StatsCards :stats="statsData" />
+    <StatsCards :stats="statsData" :loading="statsLoading" />
 
     <!-- 图表区域 -->
     <el-row :gutter="20">
@@ -26,7 +37,8 @@
       :title="error"
       type="error"
       show-icon
-      :closable="false"
+      closable
+      @close="error = ''"
       style="margin-top: 20px;"
     />
   </div>
@@ -34,35 +46,34 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
 import StatsCards from '@/components/dashboard/StatsCards.vue'
 import TrendChart from '@/components/dashboard/TrendChart.vue'
 import CategoryPie from '@/components/dashboard/CategoryPie.vue'
 import { getDashboardStats, getTicketTrend, getCategoryStats } from '@/api/index.js'
-import { DocumentAdd, Loading, SuccessFilled, WarnTriangleFilled } from '@element-plus/icons-vue'
+import { DocumentAdd, Tickets, SuccessFilled, WarnTriangleFilled, Refresh } from '@element-plus/icons-vue'
 
 const statsData = ref([
   {
     key: 'new',
     label: '新增工单',
     value: 0,
-    trend: 0,
+    trend: null,
     color: '#409EFF',
     icon: DocumentAdd
   },
   {
-    key: 'processing',
-    label: '处理中',
+    key: 'total',
+    label: '工单总数',
     value: 0,
-    trend: 0,
+    trend: null,
     color: '#E6A23C',
-    icon: Loading
+    icon: Tickets
   },
   {
     key: 'completed',
     label: '已完成',
     value: 0,
-    trend: 0,
+    trend: null,
     color: '#67C23A',
     icon: SuccessFilled
   },
@@ -70,7 +81,7 @@ const statsData = ref([
     key: 'overdue',
     label: '逾期',
     value: 0,
-    trend: 0,
+    trend: null,
     color: '#F56C6C',
     icon: WarnTriangleFilled
   }
@@ -83,47 +94,50 @@ const trendData = ref({
 })
 
 const categoryData = ref([])
+const statsLoading = ref(false)
 const trendLoading = ref(false)
 const categoryLoading = ref(false)
 const error = ref('')
 
 // 获取仪表盘统计数据
 const fetchDashboardStats = async () => {
+  statsLoading.value = true
+  error.value = ''
   try {
     const res = await getDashboardStats()
     if (res && res.data) {
       const data = res.data
-      // 更新统计卡片数据
       statsData.value = [
         {
           key: 'new',
           label: '新增工单',
-          value: data.newTickets || 0,
-          trend: data.newTicketsTrend || 0,
+          value: data.newTickets ?? 0,
+          trend: data.newTicketsTrend ?? null,
           color: '#409EFF',
           icon: DocumentAdd
         },
         {
-          key: 'processing',
-          label: '处理中',
-          value: data.processingTickets || 0,
-          trend: data.processingTicketsTrend || 0,
+          key: 'total',
+          label: '工单总数',
+          value: data.totalTickets ?? 0,
+          // 后端暂不提供总工单数的趋势数据
+          trend: null,
           color: '#E6A23C',
-          icon: Loading
+          icon: Tickets
         },
         {
           key: 'completed',
           label: '已完成',
-          value: data.completedTickets || 0,
-          trend: data.completedTicketsTrend || 0,
+          value: data.completedTickets ?? 0,
+          trend: data.completedTicketsTrend ?? null,
           color: '#67C23A',
           icon: SuccessFilled
         },
         {
           key: 'overdue',
           label: '逾期',
-          value: data.overdueTickets || 0,
-          trend: data.overdueTicketsTrend || 0,
+          value: data.overdueTickets ?? 0,
+          trend: data.overdueTicketsTrend ?? null,
           color: '#F56C6C',
           icon: WarnTriangleFilled
         }
@@ -131,41 +145,9 @@ const fetchDashboardStats = async () => {
     }
   } catch (err) {
     console.error('获取统计数据失败:', err)
-    // Use mock data as fallback for demonstration
-    statsData.value = [
-      {
-        key: 'new',
-        label: '新增工单',
-        value: 125,
-        trend: 12.5,
-        color: '#409EFF',
-        icon: DocumentAdd
-      },
-      {
-        key: 'processing',
-        label: '处理中',
-        value: 45,
-        trend: -5.2,
-        color: '#E6A23C',
-        icon: Loading
-      },
-      {
-        key: 'completed',
-        label: '已完成',
-        value: 280,
-        trend: 18.3,
-        color: '#67C23A',
-        icon: SuccessFilled
-      },
-      {
-        key: 'overdue',
-        label: '逾期',
-        value: 8,
-        trend: -2.1,
-        color: '#F56C6C',
-        icon: WarnTriangleFilled
-      }
-    ]
+    error.value = '获取统计数据失败，请稍后重试'
+  } finally {
+    statsLoading.value = false
   }
 }
 
@@ -183,22 +165,8 @@ const fetchTrendData = async (range = 'week') => {
     }
   } catch (err) {
     console.error('获取趋势数据失败:', err)
-    // Use mock data as fallback for demonstration
-    const days = range === 'week' ? 7 : 30
-    const dates = []
-    const newTickets = []
-    const completedTickets = []
-    
-    const baseDate = new Date()
-    for (let i = days - 1; i >= 0; i--) {
-      const date = new Date(baseDate)
-      date.setDate(baseDate.getDate() - i)
-      dates.push(date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }))
-      newTickets.push(Math.floor(Math.random() * 30) + 10)
-      completedTickets.push(Math.floor(Math.random() * 25) + 15)
-    }
-    
-    trendData.value = { dates, newTickets, completedTickets }
+    trendData.value = { dates: [], newTickets: [], completedTickets: [] }
+    error.value = '获取趋势数据失败，请稍后重试'
   } finally {
     trendLoading.value = false
   }
@@ -217,17 +185,18 @@ const fetchCategoryStats = async () => {
     }
   } catch (err) {
     console.error('获取分类统计失败:', err)
-    // Use mock data as fallback for demonstration
-    categoryData.value = [
-      { name: '技术支持', value: 120 },
-      { name: '功能请求', value: 80 },
-      { name: '故障报告', value: 65 },
-      { name: '账户问题', value: 45 },
-      { name: '其他', value: 30 }
-    ]
+    categoryData.value = []
+    error.value = '获取分类统计失败，请稍后重试'
   } finally {
     categoryLoading.value = false
   }
+}
+
+// 刷新所有数据
+const refreshData = () => {
+  fetchDashboardStats()
+  fetchTrendData()
+  fetchCategoryStats()
 }
 
 // 处理时间范围变化
@@ -237,9 +206,7 @@ const handleRangeChange = (range) => {
 
 // 初始化数据
 onMounted(() => {
-  fetchDashboardStats()
-  fetchTrendData()
-  fetchCategoryStats()
+  refreshData()
 })
 </script>
 
@@ -294,6 +261,13 @@ onMounted(() => {
 .dashboard > :deep(.el-alert) {
   flex-shrink: 0;
   margin-top: 20px;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+  flex-shrink: 0;
 }
 
 @keyframes fadeIn {
