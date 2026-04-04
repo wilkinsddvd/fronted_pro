@@ -89,7 +89,7 @@ const handleCommand = async (command) => {
 <style scoped>
 .header-bar {
   height: 60px;
-  background-color: #fff;
+  background-color: var(--header-bg, #ffffff);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -100,14 +100,15 @@ const handleCommand = async (command) => {
   left: 200px;
   right: 0;
   z-index: 100;
-  transition: left 0.3s;
+  transition: left 0.3s, background-color 0.3s;
 }
 
 .header-left h3 {
   margin: 0;
   font-size: 18px;
-  color: #303133;
+  color: var(--app-text-color, #303133);
   font-weight: 500;
+  transition: color 0.3s;
 }
 
 .header-right {
@@ -131,7 +132,8 @@ const handleCommand = async (command) => {
 .username {
   margin: 0 8px;
   font-size: 14px;
-  color: #606266;
+  color: var(--app-text-secondary, #606266);
+  transition: color 0.3s;
 }
 
 /* Responsive Design */

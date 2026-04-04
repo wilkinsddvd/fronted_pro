@@ -22,3 +22,71 @@ a,
 }
 
 /* Remove grid layout that was constraining width */
+
+/* ==================== Global CSS Variables ==================== */
+:root {
+  --app-bg-color: #f0f2f5;
+  --app-text-color: #303133;
+  --app-text-secondary: #909399;
+  --sidebar-bg: #304156;
+  --sidebar-logo-bg: #2b3947;
+  --header-bg: #ffffff;
+  --card-bg: #ffffff;
+  --border-color: #ebeef5;
+}
+
+html.dark {
+  --app-bg-color: #13141a;
+  --app-text-color: #e0e0e0;
+  --app-text-secondary: #a0a8b7;
+  --sidebar-bg: #1a1d23;
+  --sidebar-logo-bg: #141619;
+  --header-bg: #1e1e2e;
+  --card-bg: #1e2130;
+  --border-color: #2d3142;
+}
+
+/* Global dark mode overrides for Element Plus cards and common elements */
+html.dark .el-card {
+  background-color: var(--card-bg);
+  border-color: var(--border-color);
+  color: var(--app-text-color);
+}
+
+html.dark .el-card .el-card__header {
+  border-color: var(--border-color);
+  color: var(--app-text-color);
+}
+
+html.dark .el-tabs--border-card {
+  background-color: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+html.dark .el-tabs--border-card > .el-tabs__header {
+  background-color: #252830;
+  border-color: var(--border-color);
+}
+
+html.dark .el-tabs--border-card > .el-tabs__header .el-tabs__item {
+  color: var(--app-text-secondary);
+  border-color: var(--border-color);
+}
+
+html.dark .el-tabs--border-card > .el-tabs__header .el-tabs__item.is-active {
+  background-color: var(--card-bg);
+  color: var(--app-text-color);
+}
+
+html.dark .el-form-item__label {
+  color: var(--app-text-color);
+}
+
+html.dark .el-divider__text {
+  background-color: var(--card-bg);
+  color: var(--app-text-color);
+}
+
+html.dark .el-divider {
+  border-color: var(--border-color);
+}

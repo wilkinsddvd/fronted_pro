@@ -235,4 +235,17 @@ const handleUpdatePreferences = async (data) => {
     transform: translateY(0);
   }
 }
+
+/* Dark mode */
+:global(html.dark) .page-header h2 {
+  color: var(--app-text-color, #e0e0e0);
+}
+
+:global(html.dark) .page-header .subtitle {
+  color: var(--app-text-secondary, #a0a8b7);
+}
+
+:global(html.dark) .settings-tabs {
+  background: var(--card-bg, #1e2130);
+}
 </style>

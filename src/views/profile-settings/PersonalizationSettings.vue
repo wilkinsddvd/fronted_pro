@@ -20,15 +20,15 @@
 
       <el-form-item :label="$t('personalization.themeMode')">
         <el-radio-group v-model="formData.theme">
-          <el-radio label="light">
+          <el-radio value="light">
             <el-icon><Sunny /></el-icon>
             {{ $t('personalization.themeLight') }}
           </el-radio>
-          <el-radio label="dark">
+          <el-radio value="dark">
             <el-icon><Moon /></el-icon>
             {{ $t('personalization.themeDark') }}
           </el-radio>
-          <el-radio label="auto">
+          <el-radio value="auto">
             <el-icon><Monitor /></el-icon>
             {{ $t('personalization.themeAuto') }}
           </el-radio>
@@ -108,13 +108,13 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch, computed, inject } from 'vue'
+import { ref, reactive, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { Picture, Sunny, Moon, Monitor, Reading, Bell } from '@element-plus/icons-vue'
+import { useThemeStore } from '@/stores/themeStore'
 
-// 从 App.vue 注入的主题切换函数（若未注入则降级为 null）
-const applyTheme = inject('applyTheme', null)
+const themeStore = useThemeStore()
 
 const { t, locale } = useI18n()
 
@@ -183,6 +183,11 @@ watch(() => props.preferences, (newVal) => {
   }
 }, { immediate: true, deep: true })
 
+// 实时预览主题（选择即生效，但不持久化到 localStorage）
+watch(() => formData.theme, (newTheme) => {
+  themeStore.previewTheme(newTheme)
+})
+
 // ==================== 方法 ====================
 
 /**
@@ -201,9 +206,7 @@ const handleSave = async () => {
 
     // 立即应用主题
     localStorage.setItem('app_theme', submitData.theme)
-    if (applyTheme) {
-      applyTheme(submitData.theme)
-    }
+    themeStore.applyTheme(submitData.theme)
 
     // 立即切换语言
     localStorage.setItem('app_language', submitData.language)
