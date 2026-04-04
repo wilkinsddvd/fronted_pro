@@ -9,7 +9,7 @@
     <el-menu
       :default-active="activeMenu"
       class="sidebar-menu"
-      background-color="#304156"
+      :background-color="sidebarBg"
       text-color="#bfcbd9"
       active-text-color="#409EFF"
       :router="true"
@@ -57,27 +57,34 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { DataLine, Tickets, ChatLineSquare, TrendCharts, User, Avatar } from '@element-plus/icons-vue'
+import { useThemeStore } from '@/stores/themeStore'
 
 const route = useRoute()
+const themeStore = useThemeStore()
 
 /**
  * 根据当前路由计算激活的菜单项
  */
 const activeMenu = computed(() => route.path)
+
+/**
+ * 根据主题动态设置侧边栏背景色
+ */
+const sidebarBg = computed(() => themeStore.isDarkMode ? '#1a1d23' : '#304156')
 </script>
 
 <style scoped>
 .sidebar {
   width: 200px;
   height: 100vh;
-  background-color: #304156;
+  background-color: var(--sidebar-bg, #304156);
   position: fixed;
   left: 0;
   top: 0;
   overflow-y: auto;
   box-shadow: 2px 0 6px rgba(0, 0, 0, 0.1);
   z-index: 1000;
-  transition: transform 0.3s;
+  transition: transform 0.3s, background-color 0.3s;
 }
 
 .logo-container {
@@ -85,8 +92,9 @@ const activeMenu = computed(() => route.path)
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #2b3947;
+  background-color: var(--sidebar-logo-bg, #2b3947);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background-color 0.3s;
 }
 
 .logo-container h2 {
@@ -119,23 +127,6 @@ const activeMenu = computed(() => route.path)
 }
 
 /* Dark mode */
-:global(html.dark) .sidebar {
-  background-color: #1a1d23;
-}
-
-:global(html.dark) .logo-container {
-  background-color: #141619;
-}
-
-:global(html.dark) .sidebar-menu {
-  background-color: #1a1d23 !important;
-}
-
-:global(html.dark) .sidebar-menu :deep(.el-menu-item) {
-  background-color: #1a1d23 !important;
-  color: #a8b2c1 !important;
-}
-
 :global(html.dark) .sidebar-menu :deep(.el-menu-item:hover) {
   background-color: #252830 !important;
 }

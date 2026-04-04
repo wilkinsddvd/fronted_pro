@@ -20,7 +20,7 @@ import HeaderBar from './HeaderBar.vue'
   display: flex;
   width: 100%;
   height: 100vh;
-  background-color: #f0f2f5;
+  background-color: var(--app-bg-color, #f0f2f5);
   overflow: hidden;
 }
 
