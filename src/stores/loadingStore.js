@@ -21,7 +21,9 @@ export const useLoadingStore = defineStore('loading', () => {
    */
   const startLoading = (key = 'default', text = '加载中...') => {
     loadingText.value = text
-    loadingMap.value = new Map(loadingMap.value.set(key, true))
+    const newMap = new Map(loadingMap.value)
+    newMap.set(key, true)
+    loadingMap.value = newMap
   }
 
   /**

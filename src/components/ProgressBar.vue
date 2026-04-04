@@ -10,7 +10,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onUnmounted } from 'vue'
 import { useLoadingStore } from '@/stores/loadingStore'
 
 const loadingStore = useLoadingStore()
@@ -33,12 +33,18 @@ const start = () => {
 
 const finish = () => {
   clearInterval(timer)
+  timer = null
   progress.value = 100
   setTimeout(() => {
     visible.value = false
     progress.value = 0
   }, 400)
 }
+
+onUnmounted(() => {
+  clearInterval(timer)
+  timer = null
+})
 
 // Watch route loading state from store
 watch(() => loadingStore.routeLoading, (loading) => {

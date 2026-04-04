@@ -9,8 +9,6 @@ const request = axios.create({
 
 // Threshold in ms before showing global loading indicator
 const LOADING_DELAY = 300
-// Counter for active requests that triggered loading
-let loadingRequestCount = 0
 
 function getLoadingStore() {
   try {
@@ -42,8 +40,9 @@ request.interceptors.request.use(
     if (loadingStore && config.showLoading !== false) {
       const requestKey = `api_${Date.now()}_${Math.random()}`
       config._loadingKey = requestKey
+      config._loadingStarted = false
       config._loadingTimer = setTimeout(() => {
-        loadingRequestCount++
+        config._loadingStarted = true
         loadingStore.startLoading(requestKey, '请求中...')
       }, LOADING_DELAY)
     }
@@ -55,21 +54,24 @@ request.interceptors.request.use(
   }
 )
 
+function clearRequestLoading(config) {
+  if (!config) return
+  if (config._loadingTimer) {
+    clearTimeout(config._loadingTimer)
+    config._loadingTimer = null
+  }
+  if (config._loadingKey && config._loadingStarted) {
+    const loadingStore = getLoadingStore()
+    if (loadingStore) {
+      loadingStore.stopLoading(config._loadingKey)
+    }
+  }
+}
+
 // 响应拦截器
 request.interceptors.response.use(
   response => {
-    // Clear loading for this request
-    const config = response.config
-    if (config._loadingTimer) {
-      clearTimeout(config._loadingTimer)
-    }
-    if (config._loadingKey) {
-      const loadingStore = getLoadingStore()
-      if (loadingStore) {
-        loadingStore.stopLoading(config._loadingKey)
-        loadingRequestCount = Math.max(0, loadingRequestCount - 1)
-      }
-    }
+    clearRequestLoading(response.config)
 
     const res = response.data
     // 统一处理后端返回格式 {code, data, msg}
@@ -80,20 +82,7 @@ request.interceptors.response.use(
     return res
   },
   error => {
-    // Clear loading for this request on error
-    const config = error.config
-    if (config) {
-      if (config._loadingTimer) {
-        clearTimeout(config._loadingTimer)
-      }
-      if (config._loadingKey) {
-        const loadingStore = getLoadingStore()
-        if (loadingStore) {
-          loadingStore.stopLoading(config._loadingKey)
-          loadingRequestCount = Math.max(0, loadingRequestCount - 1)
-        }
-      }
-    }
+    clearRequestLoading(error.config)
 
     // 如果是401未授权，清除本地用户信息，跳转到登录页
     if (error.response && error.response.status === 401) {
