@@ -33,10 +33,10 @@
 
       <el-form-item label="分类" prop="category">
         <el-select v-model="formData.category" placeholder="请选择分类" style="width: 100%">
-          <el-option label="常见问题" value="faq" />
-          <el-option label="技术支持" value="technical" />
-          <el-option label="售后服务" value="after_sales" />
-          <el-option label="其他" value="other" />
+          <el-option label="水管问题" value="Plumbing" />
+          <el-option label="设备故障" value="Equipment Malfunction" />
+          <el-option label="电力问题" value="Electrical" />
+          <el-option label="其他问题" value="Others" />
         </el-select>
       </el-form-item>
     </el-form>

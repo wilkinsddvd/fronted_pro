@@ -55,9 +55,9 @@
 
         <el-form-item label="分类" prop="category">
           <el-select v-model="formData.category" placeholder="请选择分类" style="width: 100%">
-            <el-option label="技术支持" value="technical" />
-            <el-option label="售后服务" value="after_sales" />
-            <el-option label="产品咨询" value="product" />
+            <el-option label="水管漏水" value="technical" />
+            <el-option label="桌椅损坏" value="after_sales" />
+            <el-option label="饮水机故障" value="product" />
             <el-option label="其他" value="other" />
           </el-select>
         </el-form-item>
@@ -196,17 +196,6 @@ const handleClose = () => {
 }
 
 const resetForm = () => {
-  formData.value = {
-    title: '',
-    description: '',
-    category: '',
-    priority: 'medium',
-    status: 'open',
-    assignee_id: null,
-    due_date: ''
-  }
-  formRef.value?.clearValidate()
-}
 
 const handleSubmit = async () => {
   try {
@@ -232,6 +221,17 @@ const categoryLabel = (val) => {
   return map[val] || val || '—'
 }
 
+  formData.value = {
+    title: '',
+    description: '',
+    category: '',
+    priority: 'medium',
+    status: 'open',
+    assignee_id: null,
+    due_date: ''
+  }
+  formRef.value?.clearValidate()
+}
 const priorityLabel = (val) => {
   const map = { urgent: '紧急', high: '高', medium: '中', low: '低' }
   return map[val] || val || '—'
