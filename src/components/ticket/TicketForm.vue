@@ -55,10 +55,8 @@
 
         <el-form-item label="分类" prop="category">
           <el-select v-model="formData.category" placeholder="请选择分类" style="width: 100%">
-            <el-option label="技术支持" value="technical" />
-            <el-option label="售后服务" value="after_sales" />
-            <el-option label="产品咨询" value="product" />
-            <el-option label="其他" value="other" />
+            <el-option label="维修" value="维修" />
+            <el-option label="其他" value="其他" />
           </el-select>
         </el-form-item>
 
@@ -160,9 +158,7 @@ const rules = {
   description: [
     { required: true, message: '请输入工单描述', trigger: 'blur' }
   ],
-  category: [
-    { required: true, message: '请选择分类', trigger: 'change' }
-  ],
+  category: [],
   priority: [
     { required: true, message: '请选择优先级', trigger: 'change' }
   ]
@@ -228,8 +224,7 @@ const handleSubmit = async () => {
 }
 
 const categoryLabel = (val) => {
-  const map = { technical: '技术支持', after_sales: '售后服务', product: '产品咨询', other: '其他' }
-  return map[val] || val || '—'
+  return val || '—'
 }
 
 const priorityLabel = (val) => {

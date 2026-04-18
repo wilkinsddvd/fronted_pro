@@ -162,15 +162,8 @@ const currentUsername = ref('')
 
 const ticketId = computed(() => route.params.id)
 
-const categoryLabels = {
-  'technical': '技术支持',
-  'after_sales': '售后服务',
-  'product': '产品咨询',
-  'other': '其他'
-}
-
 const getCategoryLabel = (category) => {
-  return categoryLabels[category] || category
+  return category || '—'
 }
 
 const fetchTicket = async () => {

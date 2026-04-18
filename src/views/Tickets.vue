@@ -62,10 +62,8 @@
             @change="handleSearch"
             style="width: 100%"
           >
-            <el-option label="技术支持" value="technical" />
-            <el-option label="售后服务" value="after_sales" />
-            <el-option label="产品咨询" value="product" />
-            <el-option label="其他" value="other" />
+            <el-option label="维修" value="维修" />
+            <el-option label="其他" value="其他" />
           </el-select>
         </el-col>
       </el-row>
