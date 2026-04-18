@@ -1,27 +1,12 @@
-/* Full-screen background with image + white overlay */
+/* Full-screen background layout */
 .page-bg {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f0ece8;
-  background-image: url('https://picui.ogmua.cn/s1/2026/03/02/69a4da65576c1.webp');
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
   padding: 1rem;
   position: relative;
   overflow: hidden;
-}
-
-/* White semi-transparent overlay */
-.page-bg::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(255, 255, 255, 0.35);
-  pointer-events: none;
-  z-index: 0;
 }
 
 /* Top-left logo + system name header */
@@ -73,7 +58,7 @@
   max-width: 440px;
   padding: 0 0 2rem;
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.95);
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
   border: 1px solid rgba(0, 0, 0, 0.06);
   position: relative;
