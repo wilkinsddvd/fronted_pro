@@ -1,13 +1,31 @@
 /* Auth page background styles (Login & Register) */
 
-/* Light mode: clean light gray background */
+/* Light mode: full-screen background image */
 .page-bg {
+  background-image: url('https://free.picui.cn/free/2026/04/18/69e3632a368c4.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   background-color: #f0f4f8;
 }
 
-/* Dark mode: deep dark background */
+/* Semi-transparent white overlay to keep form readable */
+.page-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.30);
+  z-index: 0;
+}
+
+/* Dark mode: deep dark overlay over background image */
 html.dark .page-bg {
   background-color: #0f172a;
+}
+
+html.dark .page-bg::before {
+  background: rgba(15, 23, 42, 0.70);
 }
 
 /* Dark mode: semi-transparent dark card */
