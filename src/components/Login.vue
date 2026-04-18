@@ -60,8 +60,8 @@ async function handleLogin() {
       <div class="form-card">
         <div class="accent-bar"></div>
         <div class="avatar-wrap">
-          <el-avatar :size="64" class="form-avatar">
-            <el-icon :size="36"><User /></el-icon>
+          <el-avatar :size="80" class="form-avatar">
+            <el-icon :size="42"><User /></el-icon>
           </el-avatar>
         </div>
         <h2 class="form-title">欢迎回来</h2>
