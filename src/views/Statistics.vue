@@ -32,7 +32,7 @@
             </div>
             <div class="stat-info">
               <div class="stat-label">{{ stat.label }}</div>
-              <div class="stat-value">{{ stat.value }}</div>
+              <div class="stat-value">{{ stat.formatter ? stat.formatter(stat.value) : stat.value }}</div>
             </div>
           </div>
         </el-card>
@@ -92,7 +92,10 @@
           </template>
           <div v-loading="responseTimeLoading" class="chart-container">
             <div ref="responseTimeChartRef" style="width: 100%; height: 300px;"></div>
-            <el-empty v-if="!responseTimeLoading && responseTimeData.length === 0" description="暂无数据" />
+            <el-empty
+              v-if="!responseTimeLoading && responseTimeData.length === 0"
+              description="暂无响应时间数据，后端功能开发中"
+            />
           </div>
         </el-card>
       </el-col>
@@ -140,7 +143,14 @@ const statsConfig = [
   { key: 'total', label: '工单总数', valueKey: 'totalTickets', color: '#409EFF', icon: Document },
   { key: 'new', label: '新增工单', valueKey: 'newTickets', color: '#E6A23C', icon: DocumentAdd },
   { key: 'completed', label: '已完成', valueKey: 'completedTickets', color: '#67C23A', icon: SuccessFilled },
-  { key: 'avgTime', label: '平均响应时间(h)', valueKey: 'avgResponseTime', color: '#909399', icon: Timer }
+  {
+    key: 'avgTime',
+    label: '平均响应时间',
+    valueKey: 'avgResponseTime',
+    color: '#909399',
+    icon: Timer,
+    formatter: (val) => val > 0 ? `${val.toFixed(1)}h` : '暂无'
+  }
 ]
 
 const overviewStats = ref(statsConfig.map(stat => ({ ...stat, value: 0 })))
@@ -257,10 +267,15 @@ const fetchResponseTimeStats = async () => {
       params.startDate = dateRange.value[0].toISOString().split('T')[0]
       params.endDate = dateRange.value[1].toISOString().split('T')[0]
     }
-    
+
     const res = await getResponseTimeStats(params)
     if (res && res.data) {
-      responseTimeData.value = res.data
+      const data = res.data
+      // Treat all-zero data as "no data yet" – the backend marks this as TODO
+      const allZero = data.every(
+        item => (item.avgResponseTime || 0) === 0 && (item.maxResponseTime || 0) === 0
+      )
+      responseTimeData.value = allZero ? [] : data
       updateResponseTimeChart()
     }
   } catch (err) {
@@ -450,16 +465,21 @@ const initResponseTimeChart = () => {
 // Update response time chart
 const updateResponseTimeChart = () => {
   if (!responseTimeChart || responseTimeData.value.length === 0) return
-  
+
   const dates = responseTimeData.value.map(item => item.date)
   const avgTime = responseTimeData.value.map(item => item.avgResponseTime || 0)
   const maxTime = responseTimeData.value.map(item => item.maxResponseTime || 0)
-  
+
   const option = {
     tooltip: {
       trigger: 'axis',
       axisPointer: {
         type: 'cross'
+      },
+      formatter: (params) => {
+        const date = params[0]?.axisValue || ''
+        const lines = params.map(p => `${p.marker}${p.seriesName}: ${p.value.toFixed(1)}h`)
+        return `${date}<br/>${lines.join('<br/>')}`
       }
     },
     legend: {
@@ -480,10 +500,13 @@ const updateResponseTimeChart = () => {
     },
     yAxis: {
       type: 'value',
-      name: '小时',
+      name: '小时(h)',
       nameGap: 8,
       min: 0,
-      minInterval: 1
+      minInterval: 1,
+      axisLabel: {
+        formatter: (val) => `${val}h`
+      }
     },
     series: [
       {
@@ -512,7 +535,7 @@ const updateResponseTimeChart = () => {
       }
     ]
   }
-  
+
   responseTimeChart.setOption(option)
 }
 
