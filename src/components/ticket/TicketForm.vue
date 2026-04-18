@@ -55,10 +55,10 @@
 
         <el-form-item label="分类" prop="category">
           <el-select v-model="formData.category" placeholder="请选择分类" style="width: 100%">
-            <el-option label="水管漏水" value="technical" />
-            <el-option label="桌椅损坏" value="after_sales" />
-            <el-option label="饮水机故障" value="product" />
-            <el-option label="其他" value="other" />
+            <el-option label="水管漏水" value=" Plumbing Leak" />
+            <el-option label="桌椅损坏" value="Furniture Damage" />
+            <el-option label="饮水机故障" value="Water Cooler Issue" />
+            <el-option label="其他" value="Others" />
           </el-select>
         </el-form-item>
 
