@@ -1,30 +1,19 @@
 /* Auth page background styles (Login & Register) */
 
-/* Light mode: image + purple-blue gradient overlay */
+/* Light mode: clean light gray background */
 .page-bg {
-  background-image:
-    linear-gradient(135deg, rgba(102, 126, 234, 0.5) 0%, rgba(118, 75, 162, 0.5) 100%),
-    url('https://free.picui.cn/free/2026/04/18/69e3632a368c4.jpg');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
+  background-color: #f0f4f8;
 }
 
-/* Dark mode: image + dark gradient overlay */
+/* Dark mode: deep dark background */
 html.dark .page-bg {
-  background-image:
-    linear-gradient(135deg, rgba(26, 26, 46, 0.7) 0%, rgba(22, 33, 62, 0.7) 100%),
-    url('https://free.picui.cn/free/2026/04/18/69e3632a368c4.jpg');
+  background-color: #0f172a;
 }
 
 /* Dark mode: semi-transparent dark card */
 html.dark .form-card {
-  background-color: rgba(20, 24, 41, 0.95);
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .page-bg {
-    background-attachment: scroll;
-  }
+  background-color: rgba(20, 24, 41, 0.98);
+  border-color: rgba(255, 255, 255, 0.08);
+  border-left-color: rgba(59, 130, 246, 0.3);
+  border-right-color: rgba(59, 130, 246, 0.3);
 }
