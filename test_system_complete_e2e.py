@@ -32,6 +32,8 @@ import sys
 import time
 import traceback
 import unittest
+import urllib.error
+import urllib.request
 import uuid
 from typing import Optional
 
@@ -61,6 +63,7 @@ DEFAULT_WAIT = 20
 IMPLICIT_WAIT = 5
 SCREENSHOT_DIR = "screenshots"
 REPORT_FILE = "test_report_complete.html"
+TABLE_LIKE_SELECTOR = "table, .el-table"
 
 # 测试账户
 _ts = str(int(time.time()))[-6:]
@@ -160,6 +163,8 @@ class TestBase(unittest.TestCase):
     @classmethod
     def class_login_or_skip(cls, username: str = TEST_USER, password: str = TEST_PASS):
         """类级登录；若登录失败则跳过依赖登录的测试类"""
+        if not cls.is_backend_reachable():
+            raise unittest.SkipTest("后端服务不可达，跳过依赖登录的测试")
         cls.driver.get(BASE_URL + "/login")
         time.sleep(0.5)
         try:
@@ -205,10 +210,28 @@ class TestBase(unittest.TestCase):
 
         time.sleep(1)
         if "/login" in cls.driver.current_url:
-            page_text = cls.driver.page_source.lower()
-            if any(k in page_text for k in ("network", "fetch", "连接", "失败", "error", "错误")):
+            error_text = " ".join(
+                el.text.lower()
+                for el in cls.driver.find_elements(
+                    By.CSS_SELECTOR, ".el-alert--error, .el-message--error, .el-form-item__error, .form-alert"
+                )
+                if el and el.text
+            )
+            if any(k in error_text for k in ("network", "fetch", "连接", "失败", "error", "错误")):
                 raise unittest.SkipTest("登录接口不可用，跳过依赖登录的测试")
             raise unittest.SkipTest("登录未成功，跳过依赖登录的测试")
+
+    @staticmethod
+    def is_backend_reachable(timeout: int = 2) -> bool:
+        """检查后端服务是否可达（不校验业务状态码）"""
+        try:
+            req = urllib.request.Request(f"{API_BASE}/login", method="OPTIONS")
+            urllib.request.urlopen(req, timeout=timeout)
+            return True
+        except urllib.error.HTTPError as exc:
+            return exc.code in (400, 401, 403, 404, 405)
+        except Exception:
+            return False
 
     # -------- 等待工具 --------
     def wait_for_element(self, by: str, value: str, timeout: int = DEFAULT_WAIT):
@@ -288,10 +311,9 @@ class TestBase(unittest.TestCase):
 
         # 兜底：取页面上第一个可见可交互输入框
         for selector in (
-            "input[type='text']",
-            "input[type='email']",
-            "input:not([type])",
-            "input",
+            "input[type='text']:not([disabled]):not([type='hidden'])",
+            "input[type='email']:not([disabled]):not([type='hidden'])",
+            "input:not([disabled]):not([type='hidden'])",
             "textarea",
         ):
             try:
@@ -302,6 +324,39 @@ class TestBase(unittest.TestCase):
             except (StaleElementReferenceException, WebDriverException):
                 continue
         return None
+
+    def find_dialog_input_by_placeholder(self, placeholders, timeout: int = 8):
+        """在当前可见弹窗中按 placeholder 查找输入框"""
+        items = placeholders if isinstance(placeholders, (list, tuple)) else [placeholders]
+        for text in items:
+            safe_text = str(text).replace("'", "\\'")
+            for selector in (
+                f".el-dialog input[placeholder*='{safe_text}']:not([disabled]):not([type='hidden'])",
+                f".el-dialog textarea[placeholder*='{safe_text}']:not([disabled])",
+            ):
+                try:
+                    return self.wait_for_element(By.CSS_SELECTOR, selector, timeout=timeout)
+                except TimeoutException:
+                    continue
+        return self.wait_for_element(
+            By.CSS_SELECTOR,
+            ".el-dialog input:not([disabled]):not([type='hidden']), .el-dialog textarea:not([disabled])",
+            timeout=timeout,
+        )
+
+    def has_service_unavailable_error(self) -> bool:
+        """检测页面上是否存在接口不可用相关错误提示"""
+        text_fragments = []
+        try:
+            error_nodes = self.driver.find_elements(
+                By.CSS_SELECTOR,
+                ".el-alert--error, .el-message--error, .el-form-item__error, .form-alert",
+            )
+            text_fragments.extend([node.text.lower() for node in error_nodes if node and node.text])
+        except WebDriverException:
+            return False
+        merged = " ".join(text_fragments)
+        return any(k in merged for k in ("network", "fetch", "连接", "超时", "unavailable", "refused", "失败"))
 
     def click_button_by_text(self, texts, timeout: int = 6):
         """按文案点击按钮，适配 Element Plus 按钮与原生按钮"""
@@ -329,7 +384,11 @@ class TestBase(unittest.TestCase):
             # 用户名
             u_input = self.find_input_by_placeholder(["用户名", "账号", "邮箱", "user", "username"])
             if not u_input:
-                u_input = self.wait_for_element(By.CSS_SELECTOR, "input[type='text'], input", timeout=8)
+                u_input = self.wait_for_element(
+                    By.CSS_SELECTOR,
+                    ".el-form input[type='text']:not([disabled]):not([type='hidden']), .el-form input:not([type]):not([disabled])",
+                    timeout=8,
+                )
             u_input.clear()
             u_input.send_keys(username)
             
@@ -410,6 +469,8 @@ class TestAuthentication(TestBase):
 
     def test_01_user_registration_success(self):
         """✅ 用户注册成功"""
+        if not self.is_backend_reachable():
+            self.skipTest("后端服务不可达，跳过注册成功用例")
         self.navigate("/register")
         
         # 用户名
@@ -447,21 +508,21 @@ class TestAuthentication(TestBase):
             or "注册成功" in page_source
         )
         if not success and "/register" in current_url:
-            lower = page_source.lower()
-            if any(k in lower for k in ("network", "fetch", "连接", "error", "错误", "失败")):
+            if self.has_service_unavailable_error():
                 self.skipTest("注册接口不可用，跳过注册成功用例")
         self.assertTrue(success, f"注册失败，URL: {current_url}")
 
     def test_02_user_login_success(self):
         """✅ 用户登录成功"""
+        if not self.is_backend_reachable():
+            self.skipTest("后端服务不可达，跳过登录成功用例")
         self.login(TEST_USER, TEST_PASS)
         
         # 验证：离开登录页
         time.sleep(1)
         current_url = self.driver.current_url
         if "/login" in current_url:
-            page_text = self.driver.page_source.lower()
-            if any(k in page_text for k in ("network", "fetch", "连接", "error", "错误")):
+            if self.has_service_unavailable_error():
                 self.skipTest("登录接口不可用，跳过登录成功用例")
         self.assertNotIn("/login", current_url, f"登录后仍停留在登录页: {current_url}")
 
@@ -536,11 +597,7 @@ class TestTicketManagement(TestBase):
         
         # 填写标题
         title = f"Test-Ticket-{uuid.uuid4().hex[:8]}"
-        title_input = self.wait_for_element(
-            By.CSS_SELECTOR,
-            ".el-dialog__body input[placeholder*='工单标题'], .el-dialog input[placeholder*='标题']",
-            timeout=8,
-        )
+        title_input = self.find_dialog_input_by_placeholder(["工单标题", "标题", "title"], timeout=8)
         title_input.clear()
         title_input.send_keys(title)
         
@@ -581,7 +638,7 @@ class TestTicketManagement(TestBase):
         time.sleep(1)
         
         # 检查表格存在
-        tables = self.driver.find_elements(By.CSS_SELECTOR, "table, .el-table")
+        tables = self.driver.find_elements(By.CSS_SELECTOR, TABLE_LIKE_SELECTOR)
         self.assertTrue(len(tables) > 0, "工单列表表格未找到")
 
     def test_07_search_ticket(self):
@@ -662,11 +719,7 @@ class TestQuickReply(TestBase):
         
         # 填写标题
         title = f"QReply-{uuid.uuid4().hex[:8]}"
-        title_input = self.wait_for_element(
-            By.CSS_SELECTOR,
-            ".el-dialog__body input[placeholder*='快速回复标题'], .el-dialog input[placeholder*='标题']",
-            timeout=8,
-        )
+        title_input = self.find_dialog_input_by_placeholder(["快速回复标题", "标题", "title"], timeout=8)
         title_input.clear()
         title_input.send_keys(title)
         
@@ -765,7 +818,7 @@ class TestSettings(TestBase):
         time.sleep(1)
         
         # 检查表格
-        tables = self.driver.find_elements(By.CSS_SELECTOR, "table, .el-table")
+        tables = self.driver.find_elements(By.CSS_SELECTOR, TABLE_LIKE_SELECTOR)
         self.assertTrue(len(tables) > 0, "员工管理表格未加载")
 
     def test_16_page_navigation(self):
@@ -839,8 +892,20 @@ class HTMLTestReporter:
         if self.results:
             self.results[-1]["elapsed"] = elapsed
 
+    @staticmethod
+    def _test_name(test):
+        name = getattr(test, "_testMethodName", None)
+        if name:
+            return name
+        if hasattr(test, "id"):
+            try:
+                return test.id().split(".")[-1]
+            except Exception:
+                pass
+        return str(test)
+
     def addSuccess(self, test):
-        test_name = getattr(test, "_testMethodName", str(test))
+        test_name = self._test_name(test)
         self.results.append({
             "name": test_name,
             "class": type(test).__name__,
@@ -851,7 +916,7 @@ class HTMLTestReporter:
         print(f"  ✓ {test_name}")
 
     def addFailure(self, test, err):
-        test_name = getattr(test, "_testMethodName", str(test))
+        test_name = self._test_name(test)
         self.results.append({
             "name": test_name,
             "class": type(test).__name__,
@@ -862,7 +927,7 @@ class HTMLTestReporter:
         print(f"  ✗ {test_name}")
 
     def addError(self, test, err):
-        test_name = getattr(test, "_testMethodName", str(test))
+        test_name = self._test_name(test)
         self.results.append({
             "name": test_name,
             "class": type(test).__name__,
@@ -873,7 +938,7 @@ class HTMLTestReporter:
         print(f"  E {test_name}")
 
     def addSkip(self, test, reason):
-        test_name = getattr(test, "_testMethodName", str(test))
+        test_name = self._test_name(test)
         self.results.append({
             "name": test_name,
             "class": type(test).__name__,
